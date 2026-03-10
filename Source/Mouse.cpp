@@ -8,7 +8,7 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
-#include "Globals.h"
+#include "Common.h"
 #include "Mouse.h"
 
 #include "PlatformHelpers.h"

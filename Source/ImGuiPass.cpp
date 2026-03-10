@@ -1,4 +1,4 @@
-#include "Globals.h"
+#include "Common.h"
 #include "ImGuiPass.h"
 
 #include "Application.h"

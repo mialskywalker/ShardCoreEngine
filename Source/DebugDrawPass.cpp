@@ -1,6 +1,6 @@
 #define DEBUG_DRAW_IMPLEMENTATION
 
-#include "Globals.h"
+#include "Common.h"
 #include "DebugDrawPass.h"
 
 #include "SimpleMath.h"
