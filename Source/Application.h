@@ -7,6 +7,7 @@
 #include <chrono>
 
 class Module;
+class D3D12Module;
 
 class Application
 {
@@ -18,6 +19,8 @@ public:
 	bool		init();
 	void		update();
 	bool		cleanUp();
+
+	D3D12Module* getD3D12() { return d3d12; }
 
 	float					getFPS() const { return 1000.0f * float(MAX_FPS_TICKS) / tickSum; }
 	float					getAvgElapsedMs() const { return tickSum / float(MAX_FPS_TICKS); }
@@ -31,6 +34,7 @@ private:
 	typedef std::array<uint64_t, MAX_FPS_TICKS> TickList;
 
 	std::vector<Module*> modules;
+	D3D12Module* d3d12 = nullptr;
 
 	uint64_t lastMs = 0;
 	TickList tickList;
