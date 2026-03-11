@@ -69,6 +69,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+
+		app->update();
 	}
 
 	delete app;
