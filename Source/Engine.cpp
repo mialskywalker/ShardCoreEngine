@@ -6,6 +6,7 @@
 #include "Engine.h"
 
 #include "Application.h"
+#include "D3D12Module.h"
 
 #include <shellapi.h>
 
@@ -69,8 +70,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
-
-		app->update();
 	}
 
 	delete app;
@@ -194,6 +193,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else {
 			app->setPaused(false);
+			app->getD3D12()->resize();
 		}
 		break;
 	case WM_SYSKEYDOWN:
