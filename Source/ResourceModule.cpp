@@ -60,3 +60,64 @@ ComPtr<ID3D12Resource> ResourceModule::createUploadBuffer(size_t bufferSize, voi
 
 	return buffer;
 }
+
+// GPU-writeable buffer
+ComPtr<ID3D12Resource> ResourceModule::createDefaultBuffer(size_t bufferSize, void* data)
+{
+	// Staging buffer to copy data to the CPU
+	ComPtr<ID3D12Resource> stagingBuffer = createUploadBuffer(bufferSize, data);
+
+	D3D12Module* d3d12 = app->getD3D12();
+
+	// Default buffer
+	ComPtr<ID3D12Resource> defaultBuffer;
+
+	// set it as a buffer
+	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize);
+
+	// set heap as default type
+	CD3DX12_HEAP_PROPERTIES props(D3D12_HEAP_TYPE_DEFAULT);
+
+	// create a heap and resource linked to it
+	d3d12->getDevice()->CreateCommittedResource(
+		&props,
+		D3D12_HEAP_FLAG_NONE,
+		&desc,
+		D3D12_RESOURCE_STATE_COMMON,
+		nullptr,
+		IID_PPV_ARGS(&defaultBuffer)
+	);
+
+	// transition from common state to copy dest
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		defaultBuffer.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_COPY_DEST
+	);
+
+	commandList->ResourceBarrier(1, &barrier);
+
+	// cpu-gpu copy
+	commandList->CopyResource(defaultBuffer.Get(), stagingBuffer.Get());
+
+	// transition from copy dest state to vertex and constant buffer
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		defaultBuffer.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER
+	);
+
+	commandList->ResourceBarrier(1, &barrier);
+
+	// close and execute command list + flush, reset after done
+	commandList->Close();
+
+	ID3D12CommandList* lists[] = { commandList.Get() };
+	d3d12->getCommandQueue()->ExecuteCommandLists(1, lists);
+
+	d3d12->flush();
+	commandAllocator->Reset();
+	commandList->Reset(commandAllocator.Get(), nullptr);
+
+	return defaultBuffer;
+}
