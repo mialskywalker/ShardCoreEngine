@@ -1,12 +1,15 @@
 #include "Common.h"
 #include "D3D12Module.h"
 
+// Save the window handle used for swap chain creation and window size queries
 D3D12Module::D3D12Module(HWND hwnd) : hWnd(hwnd) {}
 
 D3D12Module::~D3D12Module() 
 {
+	// ensure GPU has finished all submitted work
 	flush();
 
+	// Release the fence event handle
 	if (fenceEvent)
 	{
 		CloseHandle(fenceEvent);
@@ -14,6 +17,9 @@ D3D12Module::~D3D12Module()
 	}
 }
 
+// Initialize the complete D3D12 rendering context
+// device, command queue, swap chain, render targets, command infrastructure
+// syncronization objects, and depth-stencil resources
 bool D3D12Module::init()
 {
 	bool ok = false;
@@ -42,32 +48,46 @@ bool D3D12Module::init()
 	return ok;
 }
 
-// PreRender
+// Prepare the current frame
+// wait until the current back buffer is no longer used by the GPU
+// reset its command allocator and reset the main command list for recording
 void D3D12Module::preRender()
 {
+	// take the current back buffer index
 	currentBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	// check if the gpu has used this frame - if yes -> ensure it has finished
 	if (fenceValues[currentBufferIndex] != 0)
 	{
+		// signal when fence reaches a value
 		fence->SetEventOnCompletion(fenceValues[currentBufferIndex], fenceEvent);
+		// CPU blocked while GPU reaches that value
 		WaitForSingleObject(fenceEvent, INFINITE);
 	}
+	// must be reset after gpu is finished with it
 	commandAllocators[currentBufferIndex]->Reset();
+	// prepare the command list for taking new commands
 	commandList->Reset(commandAllocators[currentBufferIndex].Get(), nullptr);
 }
 
-// PostRender
+// Finish recording the frame commands, submit them to the GPU
+// present the current back buffer and signal a fence value for synchronization
 void D3D12Module::postRender()
 {
+	// close and execute the command list
 	commandList->Close();
 	ID3D12CommandList* lists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists(1, lists);
 
+	// tell the swap chain to show the current back buffer
 	swapChain->Present(vsync ? 1 : 0, 0);
+	// this frame/buffer is linked to this fence value
 	fenceValues[currentBufferIndex] = ++fenceValue;
+	// tell the gpu queue when it reaches this value that the cpu can continue after that
 	commandQueue->Signal(fence.Get(), fenceValue);
 }
 
-// Flush the GPU
+// Force the CPU to wait until the GPU finishes all previously submitted work
 void D3D12Module::flush()
 {
 	if (!commandQueue || !fence || !fenceEvent)
@@ -78,7 +98,7 @@ void D3D12Module::flush()
 	WaitForSingleObject(fenceEvent, INFINITE);
 }
 
-// Enable debug layer for debugging information
+// Enable debug layer for validation errors and warnings in debug mode
 void D3D12Module::enableDebugLayer()
 {
 	D3D12GetDebugInterface(IID_PPV_ARGS(&debugLayer));
@@ -108,7 +128,7 @@ bool D3D12Module::createDevice()
 	return ok;
 }
 
-// Setup info queue for breaking when error occurs
+// Configure the debug info queue to break execution on severe validation messages.
 void D3D12Module::setupInfoQueue()
 {
 	if (SUCCEEDED(device.As(&infoQueue)))
@@ -188,7 +208,8 @@ void D3D12Module::createRTV()
 	}
 }
 
-// Create Command Allocators
+// Create one command allocator per frame-in-flight so each buffered frame
+// can manage its own command memory safely
 bool D3D12Module::createCommandAllocators()
 {
 	for (unsigned i = 0; i < FRAMES_IN_FLIGHT; ++i)
@@ -202,7 +223,8 @@ bool D3D12Module::createCommandAllocators()
 	return true;
 }
 
-// Create a Command List
+// Create the main graphics command list and close it immediately
+// It will be reset and recorded again every frame
 bool D3D12Module::createCommandList()
 {
 	bool ok = false;
@@ -213,7 +235,7 @@ bool D3D12Module::createCommandList()
 	return ok;
 }
 
-// Create a Fence
+// Create the fence object and an OS event used to wait for GPU completion
 bool D3D12Module::createFence()
 {
 	if (FAILED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence))))
@@ -270,7 +292,8 @@ void D3D12Module::getWindowSize(unsigned& width, unsigned& height)
 	height = unsigned(rect.bottom - rect.top);
 }
 
-// Resize Window
+// Recreate all window-size-dependent resources when the client area changes
+// back buffers, RTVs, depth buffer, and DSV.
 void D3D12Module::resize()
 {
 	unsigned width, height;
@@ -304,12 +327,16 @@ void D3D12Module::resize()
 	}
 }
 
-// Get RTV and DSV CPU Handles
+// Get the RTV handle for the current back buffer.
 D3D12_CPU_DESCRIPTOR_HANDLE D3D12Module::getRTVCPUDescriptorHandle()
 {
-	return CD3DX12_CPU_DESCRIPTOR_HANDLE(RTVdescriptorHeap->GetCPUDescriptorHandleForHeapStart(), currentBufferIndex, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+	return CD3DX12_CPU_DESCRIPTOR_HANDLE(RTVdescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+		currentBufferIndex,
+		device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+	);
 }
 
+// Get the DSV handle for the depth buffer.
 D3D12_CPU_DESCRIPTOR_HANDLE D3D12Module::getDSVCPUDescriptorHandle()
 {
 	return DSVdescriptorHeap->GetCPUDescriptorHandleForHeapStart();

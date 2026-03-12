@@ -1,19 +1,19 @@
 #include "Common.h"
-#include "ModuleEditor.h"
+#include "EditorModule.h"
 
 #include "ImGuiPass.h"
 #include "Application.h"
 #include "D3D12Module.h"
 
-ModuleEditor::ModuleEditor() {}
+EditorModule::EditorModule() {}
 
-ModuleEditor::~ModuleEditor()
+EditorModule::~EditorModule()
 {
 	delete imGuiPass;
 	imGuiPass = nullptr;
 }
 
-bool ModuleEditor::init()
+bool EditorModule::init()
 {
 	D3D12Module* d3d12 = app->getD3D12();
 	// add cpu and gpu handles when implemented
@@ -22,7 +22,7 @@ bool ModuleEditor::init()
 	return true;
 }
 
-void ModuleEditor::update()
+void EditorModule::update()
 {
 	fpsHistory[historyIndex] = float(app->getFPS());
 	msHistory[historyIndex] = float(app->getElapsedMs());
@@ -33,7 +33,7 @@ void ModuleEditor::update()
 		app->getD3D12()->setVSYNC(vsync);
 }
 
-void ModuleEditor::mainSettings()
+void EditorModule::mainSettings()
 {
 	ImGui::Begin("Configuration");
 	ImGui::SetNextWindowSize(ImVec2(480, 720), ImGuiCond_Always);
@@ -64,12 +64,12 @@ void ModuleEditor::mainSettings()
 	ImGui::End();
 }
 
-void ModuleEditor::preRender()
+void EditorModule::preRender()
 {
 	imGuiPass->startFrame();
 }
 
-void ModuleEditor::render()
+void EditorModule::render()
 {
 	mainSettings();
 }

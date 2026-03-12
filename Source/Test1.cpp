@@ -3,7 +3,7 @@
 
 #include "Application.h"
 #include "D3D12Module.h"
-#include "ModuleEditor.h"
+#include "EditorModule.h"
 
 bool Test1::init()
 {

@@ -6,12 +6,12 @@
 class ImGuiPass;
 class D3D12Module;
 
-class ModuleEditor : public Module
+class EditorModule : public Module
 {
 public:
 
-	ModuleEditor();
-	~ModuleEditor();
+	EditorModule();
+	~EditorModule();
 
 public:
 

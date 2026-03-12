@@ -10,7 +10,7 @@
     <ClCompile Include="Test1.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleEditor.cpp">
+    <ClCompile Include="EditorModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Application.cpp">
@@ -64,6 +64,9 @@
     <ClCompile Include="ImGuiPass.cpp">
       <Filter>Passes\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -78,7 +81,7 @@
     <ClInclude Include="Test1.h">
       <Filter>Tests</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleEditor.h">
+    <ClInclude Include="EditorModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Application.h">
@@ -143,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="PlatformHelpers.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceModule.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
