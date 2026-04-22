@@ -1,7 +1,9 @@
-#include <iostream>
+#include "Application.h"
 
 int main()
 {
-	std::cout << "Engine start\n";
+	Application app;
+	app.Run();
+
 	return 0;
 }
