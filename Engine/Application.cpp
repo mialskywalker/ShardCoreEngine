@@ -7,16 +7,24 @@ Application::~Application() {}
 
 void Application::Run()
 {
-	int count = 0;
+	m_Window.Init();
+
 	while (m_Running)
 	{
-		// Update
-		std::cout << "Engine running\n";
-		if (count == 5)
-			m_Running = false;
-		count++;
-		m_Time.Update();
-		std::cout << m_Time.GetDeltaTime() << "\n";
-		// Render
+		m_Running = m_Window.ProcessEvents();
+
+		Update();
+		Render();
 	}
+}
+
+void Application::Update()
+{
+	m_Time.Update();
+	std::cout << m_Time.GetDeltaTime() << "\n";
+}
+
+void Application::Render()
+{
+	std::cout << "Rendering...\n";
 }

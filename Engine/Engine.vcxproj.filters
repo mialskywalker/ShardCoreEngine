@@ -28,6 +28,9 @@
     <ClCompile Include="Time.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="Time.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
