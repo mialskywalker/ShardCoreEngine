@@ -8,6 +8,7 @@ Application::~Application() {}
 void Application::Run()
 {
 	m_Window.Init();
+	m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
 	while (m_Running)
 	{
@@ -26,5 +27,5 @@ void Application::Update()
 
 void Application::Render()
 {
-	std::cout << "Rendering...\n";
+	m_Renderer.Render();
 }

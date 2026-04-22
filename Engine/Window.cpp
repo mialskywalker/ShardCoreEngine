@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "resource.h"
 
 Window::Window() {}
 
@@ -25,16 +26,17 @@ bool Window::Init()
 	wc.lpfnWndProc = WndProc;
 	wc.hInstance = hInstance;
 	wc.lpszClassName = L"ShardCoreWindowClass";
+	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	
 	RegisterClass(&wc);
 
 	m_Hwnd = CreateWindowEx(
 		0,
 		L"ShardCoreWindowClass",
-		L"ShardCore Engine",
+		m_Title,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		1280, 720,
+		m_Width, m_Height,
 		nullptr,
 		nullptr,
 		hInstance,
