@@ -22,7 +22,7 @@ void Application::Run()
 void Application::Update()
 {
 	m_Time.Update();
-	std::cout << m_Time.GetDeltaTime() << "\n";
+	//std::cout << m_Time.GetDeltaTime() << "\n";
 }
 
 void Application::Render()

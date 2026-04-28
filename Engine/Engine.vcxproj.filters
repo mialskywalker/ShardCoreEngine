@@ -49,6 +49,7 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="d3dx12.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc" />
