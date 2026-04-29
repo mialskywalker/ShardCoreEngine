@@ -16,10 +16,25 @@ Renderer::~Renderer()
 
 bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 {
+	// setting window props
 	m_Hwnd = hwnd;
 	m_Width = width;
 	m_Height = height;
-	
+
+	// setting Viewport and ScissorRect
+	m_Viewport.TopLeftX = 0.0f;
+	m_Viewport.TopLeftY = 0.0f;
+	m_Viewport.Width = static_cast<float>(m_Width);
+	m_Viewport.Height = static_cast<float>(m_Height);
+	m_Viewport.MinDepth = 0.0f;
+	m_Viewport.MaxDepth = 1.0f;
+
+	m_ScissorRect.left = 0;
+	m_ScissorRect.top = 0;
+	m_ScissorRect.right = static_cast<LONG>(m_Width);
+	m_ScissorRect.bottom = static_cast<LONG>(m_Height);
+
+	// initializing DX12
 	bool ok = CreateFactory();
 	ok = ok && PickAdapter();
 	ok = ok && CreateDevice();
@@ -45,6 +60,9 @@ void Renderer::Render()
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_BackBuffers[m_CurrentFrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	m_CommandList->ResourceBarrier(1, &barrier);
+
+	m_CommandList->RSSetViewports(1, &m_Viewport);
+	m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
 	auto RTVhandle = m_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	RTVhandle.ptr += m_CurrentFrameIndex * m_RTVDescriptorSize;

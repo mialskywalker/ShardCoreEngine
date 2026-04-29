@@ -45,6 +45,9 @@ private:
 	uint64_t m_FenceValue = 0;
 	HANDLE m_FenceEvent;
 
+	D3D12_VIEWPORT m_Viewport = {};
+	D3D12_RECT m_ScissorRect = {};
+
 private:
 	bool CreateFactory();
 	bool PickAdapter();
