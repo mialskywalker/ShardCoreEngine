@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Logger.h"
 
 Application::Application() {}
 
@@ -17,6 +18,9 @@ void Application::Run()
 		Update();
 		Render();
 	}
+
+	Logger::Log("Application exit!");
+	Logger::Clear();
 }
 
 void Application::Update()

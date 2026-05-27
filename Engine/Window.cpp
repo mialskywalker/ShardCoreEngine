@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "resource.h"
+#include "Logger.h"
 
 Window::Window() {}
 
@@ -50,6 +51,9 @@ bool Window::Init()
 		return false;
 
 	ShowWindow(m_Hwnd, SW_SHOW);
+
+	Logger::Log("Window initialization successful!"); // Debug log
+
 	return true;
 }
 
