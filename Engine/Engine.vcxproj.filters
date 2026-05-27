@@ -28,6 +28,9 @@
     <ClCompile Include="Window.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -37,6 +40,9 @@
     </ClInclude>
     <ClInclude Include="Window.h">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

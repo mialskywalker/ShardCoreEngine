@@ -18,7 +18,7 @@ private:
 	const wchar_t* m_Title = L"ShardCore Engine";
 
 public:
-	HWND getHandle() const { return m_Hwnd; }
-	uint32_t getWidth() const { return m_Width; }
-	uint32_t getHeight() const { return m_Height; }
+	HWND GetHandle() const { return m_Hwnd; }
+	uint32_t GetWidth() const { return m_Width; }
+	uint32_t GetHeight() const { return m_Height; }
 };
