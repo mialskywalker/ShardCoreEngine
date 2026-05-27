@@ -1,5 +1,4 @@
 #include "Application.h"
-#include <iostream>
 
 Application::Application() {}
 
@@ -13,6 +12,7 @@ void Application::Run()
 	while (m_Running)
 	{
 		m_Running = m_Window.ProcessEvents();
+		m_Time.Update();
 
 		Update();
 		Render();
@@ -21,7 +21,7 @@ void Application::Run()
 
 void Application::Update()
 {
-	std::cout << "Running..." << std::endl;
+	
 }
 
 void Application::Render()

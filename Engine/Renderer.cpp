@@ -1,6 +1,4 @@
 #include "Renderer.h"
-#include <iostream>
-
 
 Renderer::Renderer() {}
 
@@ -17,5 +15,5 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 
 void Renderer::Render()
 {
-	std::cout << "Rendering" << std::endl;
+	
 }

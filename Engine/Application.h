@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "Renderer.h"
+#include "Time.h"
 
 class Application
 {
@@ -18,4 +19,5 @@ private:
 	bool m_Running = true;
 	Window m_Window;
 	Renderer m_Renderer;
+	Time m_Time;
 };

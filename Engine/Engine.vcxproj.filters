@@ -31,6 +31,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -43,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
