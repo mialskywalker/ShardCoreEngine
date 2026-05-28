@@ -14,6 +14,12 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	bool ok = CreateFactory();
 	ok = ok && PickAdapter();
 	ok = ok && CreateDevice();
+	ok = ok && CreateCommandQueue();
+	ok = ok && CreateSwapChain();
+	ok = ok && CreateRTVDescriptorHeap();
+	ok = ok && CreateRTV();
+	ok = ok && CreateCommandAllocators();
+	ok = ok && CreateCommandList();
 
 	Logger::Log("Renderer initialization successful");
 
@@ -79,6 +85,144 @@ bool Renderer::CreateDevice()
 	else
 	{
 		Logger::Log("Device creation FAILED");
+	}
+
+	return ok;
+}
+
+bool Renderer::CreateCommandQueue()
+{
+	D3D12_COMMAND_QUEUE_DESC desc = {};
+
+	desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+	desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+
+	bool ok = SUCCEEDED(m_Device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_CommandQueue)));
+
+	if (ok)
+	{
+		Logger::Log("Created A Command Queue");
+	}
+	else
+	{
+		Logger::Log("Command Queue Creation FAILED");
+	}
+
+	return ok;
+}
+
+bool Renderer::CreateSwapChain()
+{
+	DXGI_SWAP_CHAIN_DESC1 desc = {};
+
+	desc.Width = m_Width;
+	desc.Height = m_Height;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	desc.Stereo = FALSE;
+	desc.SampleDesc = { 1, 0 };
+	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	desc.BufferCount = 2;
+
+	desc.Scaling = DXGI_SCALING_NONE;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+
+	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+	desc.Flags = 0;
+
+	ComPtr<IDXGISwapChain1> swapChain1;
+
+	bool ok = SUCCEEDED(m_Factory->CreateSwapChainForHwnd(m_CommandQueue.Get(), m_Hwnd, &desc, nullptr, nullptr, &swapChain1));
+
+	ok = ok && SUCCEEDED(swapChain1.As(&m_SwapChain));
+
+	if (ok)
+	{
+		Logger::Log("Created Swap Chain");
+	}
+	else
+	{
+		Logger::Log("Swap Chain Creation FAILED");
+	}
+
+	return ok;
+}
+
+bool Renderer::CreateRTVDescriptorHeap()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+
+	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	desc.NumDescriptors = 2;
+
+	bool ok = SUCCEEDED(m_Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_RTVDescriptorHeap)));
+
+	if (ok)
+	{
+		Logger::Log("Descriptor Heap Created");
+	}
+	else
+	{
+		Logger::Log("Descriptor Heap Creation FAILED");
+	}
+
+	return ok;
+}
+
+bool Renderer::CreateRTV()
+{
+	auto rtvDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	for (int i = 0; i < 2; ++i)
+	{
+		if (FAILED(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_BackBuffers[i]))))
+		{
+			Logger::Log("RTVs Creation FAILED");
+			return false;
+		}
+		m_Device->CreateRenderTargetView(m_BackBuffers[i].Get(), nullptr, rtvHandle);
+		rtvHandle.Offset(rtvDescriptorSize);
+	}
+
+	Logger::Log("RTVs Created");
+	return true;
+}
+
+bool Renderer::CreateCommandAllocators()
+{
+	bool ok = true;
+
+	for (int i = 0; i < 2; ++i)
+	{
+		ok = ok && SUCCEEDED(m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocators[i])));
+	}
+
+	if (ok)
+	{
+		Logger::Log("Command Allocators Created");
+	}
+	else
+	{
+		Logger::Log("Command Allocators Creation FAILED");
+	}
+
+	return ok;
+}
+
+bool Renderer::CreateCommandList()
+{
+	bool ok = SUCCEEDED(m_Device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_CommandList)));
+	
+	if (ok)
+	{
+		Logger::Log("Command List Created");
+	}
+	else
+	{
+		Logger::Log("Command List Creation FAILED");
 	}
 
 	return ok;

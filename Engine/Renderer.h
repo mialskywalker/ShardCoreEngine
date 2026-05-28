@@ -25,10 +25,27 @@ private:
 	// DirectX 12
 	ComPtr<IDXGIFactory6> m_Factory;
 	ComPtr<IDXGIAdapter4> m_Adapter;
-	ComPtr<ID3D12Device> m_Device;
+	ComPtr<ID3D12Device4> m_Device;
+
+	ComPtr<ID3D12CommandQueue> m_CommandQueue;
+	ComPtr<ID3D12CommandAllocator> m_CommandAllocators[2];
+	ComPtr<ID3D12GraphicsCommandList> m_CommandList;
+
+	ComPtr<ID3D12Resource> m_BackBuffers[2];
+	ComPtr<IDXGISwapChain4> m_SwapChain;
+
+	ComPtr<ID3D12DescriptorHeap> m_RTVDescriptorHeap;
 
 private:
 	bool CreateFactory();
 	bool PickAdapter();
 	bool CreateDevice();
+	
+	bool CreateCommandQueue();
+	bool CreateSwapChain();
+	bool CreateRTVDescriptorHeap();
+	bool CreateRTV();
+
+	bool CreateCommandAllocators();
+	bool CreateCommandList();
 };
