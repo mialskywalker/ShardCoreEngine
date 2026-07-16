@@ -30,5 +30,5 @@ void Application::Update()
 
 void Application::Render()
 {
-	m_Renderer.Render();
+	//m_Renderer.Render();
 }
