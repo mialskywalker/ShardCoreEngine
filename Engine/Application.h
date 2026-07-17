@@ -19,6 +19,6 @@ private:
 private:
 	bool m_Running = true;
 	Window m_Window;
-	Renderer m_Renderer;
 	Time m_Time;
+	Renderer m_Renderer;
 };
