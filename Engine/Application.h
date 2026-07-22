@@ -17,8 +17,8 @@ private:
 	void Render();
 
 private:
-	bool m_Running = true;
-	Window m_Window;
-	Time m_Time;
-	Renderer m_Renderer;
+	bool			m_Running = true;
+	Window			m_Window;
+	Time			m_Time;
+	Renderer		m_Renderer;
 };

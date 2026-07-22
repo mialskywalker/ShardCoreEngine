@@ -12,10 +12,10 @@ public:
 	bool ProcessEvents();
 
 private:
-	HWND m_Hwnd = nullptr;
-	uint32_t m_Width = 1280;
-	uint32_t m_Height = 720;
-	const wchar_t* m_Title = L"ShardCore Engine";
+	HWND				m_Hwnd = nullptr;
+	uint32_t			m_Width = 1280;
+	uint32_t			m_Height = 720;
+	const wchar_t*		m_Title = L"ShardCore Engine";
 
 public:
 	HWND GetHandle() const { return m_Hwnd; }

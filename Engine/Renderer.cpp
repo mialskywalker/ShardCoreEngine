@@ -29,7 +29,7 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	ok = ok && CreateFence();
 
 	if (ok)
-		Logger::Log("Renderer initialization successful");
+		Logger::Log("DX12 initialization success");
 	
 	return ok;
 }
