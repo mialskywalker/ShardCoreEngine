@@ -12,7 +12,6 @@ bool ResourceModule::Init(D3D12Module* d3d12)
 		return false;
 
 	m_D3D12 = d3d12;
-
 	return true;
 }
 
