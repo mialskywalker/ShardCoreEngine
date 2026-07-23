@@ -37,6 +37,9 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceModule.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceModule.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

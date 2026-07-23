@@ -8,6 +8,8 @@
 
 using Microsoft::WRL::ComPtr;
 
+class ResourceModule;
+
 class Renderer
 {
 public:
@@ -19,6 +21,10 @@ public:
 	void PreRender();
 	void Render();
 	void PostRender();
+
+	// TESTING
+	bool TestUploadBuffer();
+	bool TestDefaultBuffer();
 
 private:
 	HWND										m_Hwnd = nullptr;
@@ -50,6 +56,10 @@ private:
 	uint64_t									m_FenceValue = 0;
 	HANDLE										m_FenceEvent;
 
+	// Modules
+	ResourceModule*								m_ResourceModule = nullptr;
+	float										m_ClearColor[4];
+
 private:
 	void EnableDebugLayer();
 	void EnableInfoQueue();
@@ -65,4 +75,7 @@ private:
 
 	bool CreateFence();
 	void WaitForGPU();
+
+	// Buffers
+	ComPtr<ID3D12Resource> UploadToDefaultBuffer(size_t bufferSize, void* data);
 };

@@ -135,6 +135,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ResourceModule.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -144,6 +145,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceModule.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
