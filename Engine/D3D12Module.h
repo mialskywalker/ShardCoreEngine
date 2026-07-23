@@ -63,25 +63,25 @@ private:
 	bool CreateFence();
 
 public:
-	HWND GetHWND() const { return m_Hwnd; }
-	uint32_t GetWidth() const { return m_Width; }
-	uint32_t GetHeight() const { return m_Height; }
-	uint32_t GetFramesInFlight() const { return m_FramesInFlight; }
+	HWND							GetHWND() const { return m_Hwnd; }
+	uint32_t						GetWidth() const { return m_Width; }
+	uint32_t						GetHeight() const { return m_Height; }
+	uint32_t						GetFramesInFlight() const { return m_FramesInFlight; }
 
-	IDXGIFactory6* GetFactory() const { return m_Factory.Get(); }
-	IDXGIAdapter4* GetAdapter() const { return m_Adapter.Get(); }
-	ID3D12Device5* GetDevice() const { return m_Device.Get(); }
+	IDXGIFactory6*					GetFactory() const { return m_Factory.Get(); }
+	IDXGIAdapter4*					GetAdapter() const { return m_Adapter.Get(); }
+	ID3D12Device5*					GetDevice() const { return m_Device.Get(); }
 
-	ID3D12CommandQueue* GetCommandQueue() const { return m_CommandQueue.Get(); }
-	ID3D12CommandAllocator* GetCurrentCommandAllocator() const { return m_CommandAllocators[m_CurrentFrameIndex].Get(); }
-	ID3D12GraphicsCommandList* GetCommandList() const { return m_CommandList.Get(); }
+	ID3D12CommandQueue*				GetCommandQueue() const { return m_CommandQueue.Get(); }
+	ID3D12CommandAllocator*			GetCurrentCommandAllocator() const { return m_CommandAllocators[m_CurrentFrameIndex].Get(); }
+	ID3D12GraphicsCommandList*		GetCommandList() const { return m_CommandList.Get(); }
 
-	ID3D12Resource* GetCurrentBackBuffer() const { return m_BackBuffers[m_CurrentFrameIndex].Get(); }
-	IDXGISwapChain4* GetSwapChain() const { return m_SwapChain.Get(); }
+	ID3D12Resource*					GetCurrentBackBuffer() const { return m_BackBuffers[m_CurrentFrameIndex].Get(); }
+	IDXGISwapChain4*				GetSwapChain() const { return m_SwapChain.Get(); }
 
-	uint32_t GetCurrentFrameIndex() const { return m_CurrentFrameIndex; }
+	uint32_t						GetCurrentFrameIndex() const { return m_CurrentFrameIndex; }
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRTVHandle() const;
-	void WaitForGPU();
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetCurrentRTVHandle() const;
+	void							WaitForGPU();
 
 };

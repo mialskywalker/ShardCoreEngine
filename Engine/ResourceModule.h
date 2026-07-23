@@ -8,17 +8,19 @@
 
 using Microsoft::WRL::ComPtr;
 
+class D3D12Module;
+
 class ResourceModule
 {
 public:
 	ResourceModule();
 	~ResourceModule();
 
-	bool Init(ID3D12Device5* device);
+	bool Init(D3D12Module* d3d12);
 
 	ComPtr<ID3D12Resource> CreateUploadBuffer(size_t bufferSize, void* data);
-	ComPtr<ID3D12Resource> CreateDefaultBuffer(size_t bufferSize);
+	ComPtr<ID3D12Resource> CreateDefaultBuffer(size_t bufferSize, void* data);
 
 private:
-	ID3D12Device5* m_Device;
+	D3D12Module* m_D3D12 = nullptr;
 };
