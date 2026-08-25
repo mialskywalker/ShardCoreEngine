@@ -17,6 +17,9 @@
     <Filter Include="Game">
       <UniqueIdentifier>{3b73ca26-bf4b-42f5-b874-302455af0864}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f31f6131-e898-41fa-9907-0a1ce13898b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +71,7 @@
     <ClInclude Include="D3D12Module.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="ReadData.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc" />
@@ -75,5 +79,13 @@
   <ItemGroup>
     <Image Include="..\Game\Engine.ico" />
     <Image Include="..\Game\EngineSmall.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

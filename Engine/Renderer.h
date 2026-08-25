@@ -4,6 +4,13 @@
 #include <cstdint>
 #include <memory>
 
+#include <dxgi1_6.h>
+#include <d3d12.h>
+#include "d3dx12.h"
+#include <wrl.h>
+
+using Microsoft::WRL::ComPtr;
+
 class D3D12Module;
 class ResourceModule;
 
@@ -27,4 +34,7 @@ private:
 public:
 	D3D12Module* GetD3D12() const { return m_D3D12Module.get(); }
 
+private:
+	ComPtr<ID3D12Resource>						m_vertexBuffer;
+	D3D12_VERTEX_BUFFER_VIEW					vbv;
 };

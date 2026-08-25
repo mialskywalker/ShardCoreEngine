@@ -47,6 +47,9 @@ private:
 	uint64_t									m_FenceValue = 0;
 	HANDLE										m_FenceEvent;
 
+	ComPtr<ID3D12RootSignature>					m_RootSignature;
+	ComPtr<ID3D12PipelineState>					m_PipelineStateObject;
+
 private:
 	void EnableDebugLayer();
 	void EnableInfoQueue();
@@ -61,6 +64,9 @@ private:
 	bool CreateCommandList();
 
 	bool CreateFence();
+
+	bool CreateRootSignature();
+	bool CreatePipelineStateObject();
 
 public:
 	HWND							GetHWND() const { return m_Hwnd; }
@@ -82,6 +88,9 @@ public:
 	uint32_t						GetCurrentFrameIndex() const { return m_CurrentFrameIndex; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetCurrentRTVHandle() const;
-	void							WaitForGPU();
 
+	ID3D12RootSignature*			GetRootSignature() const { return m_RootSignature.Get(); }
+	ID3D12PipelineState*			GetPipelineStateObject() const { return m_PipelineStateObject.Get(); }
+
+	void							WaitForGPU();
 };

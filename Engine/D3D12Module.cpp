@@ -2,6 +2,7 @@
 #include "Logger.h"
 
 #include "ResourceModule.h"
+#include "ReadData.h"
 
 D3D12Module::D3D12Module() {}
 
@@ -31,6 +32,8 @@ bool D3D12Module::Init(HWND hwnd, uint32_t width, uint32_t height)
 	ok = ok && CreateCommandAllocators();
 	ok = ok && CreateCommandList();
 	ok = ok && CreateFence();
+	ok = ok && CreateRootSignature();
+	ok = ok && CreatePipelineStateObject();
 
 	return ok;
 }
@@ -38,7 +41,7 @@ bool D3D12Module::Init(HWND hwnd, uint32_t width, uint32_t height)
 void D3D12Module::BeginFrame()
 {
 	m_CommandAllocators[m_CurrentFrameIndex]->Reset();
-	m_CommandList->Reset(m_CommandAllocators[m_CurrentFrameIndex].Get(), nullptr);
+	m_CommandList->Reset(m_CommandAllocators[m_CurrentFrameIndex].Get(), m_PipelineStateObject.Get());
 }
 
 void D3D12Module::EndFrame()
@@ -225,6 +228,59 @@ bool D3D12Module::CreateFence()
 	Logger::Log("Fence + Event Created!");
 
 	return m_FenceEvent != nullptr;
+}
+
+bool D3D12Module::CreateRootSignature()
+{
+	bool ok = false;
+
+	CD3DX12_ROOT_SIGNATURE_DESC desc = {};
+	desc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> blob;
+	ok = SUCCEEDED(D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr));
+	ok = ok && SUCCEEDED(m_Device->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
+
+	if (ok)
+		Logger::Log("Root Signature created");
+	else
+		Logger::Log("Root Signature creation failed");
+
+	return ok;
+}
+
+bool D3D12Module::CreatePipelineStateObject()
+{
+	bool ok = false;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+	desc.pRootSignature = m_RootSignature.Get();
+
+	auto dataVS = DX::ReadData(L"VertexShader.cso");
+	auto dataPS = DX::ReadData(L"PixelShader.cso");
+
+	desc.VS = { dataVS.data(), dataVS.size() };
+	desc.PS = { dataPS.data(), dataPS.size() };
+
+	D3D12_INPUT_ELEMENT_DESC layout[] = { {"MY_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} };
+
+	desc.InputLayout = { layout, sizeof(layout) / sizeof(D3D12_INPUT_ELEMENT_DESC) };
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.NumRenderTargets = 1;
+	desc.SampleDesc = { 1, 0 };
+	desc.SampleMask = 0xffffffff;
+	desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+
+	ok = SUCCEEDED(m_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_PipelineStateObject)));
+
+	if (ok)
+		Logger::Log("Pipeline State Object created");
+	else
+		Logger::Log("Pipeline State Object creation failed");
+
+	return ok;
 }
 
 void D3D12Module::WaitForGPU()
