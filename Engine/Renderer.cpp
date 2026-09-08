@@ -21,16 +21,29 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	ok = ok && m_ResourceModule->Init(m_D3D12Module.get());
 
 	// try to render a triangle
+	//struct Vertex
+	//{
+	//	float position[3];
+	//};
+
+	//Vertex vertices[3] =
+	//{
+	//	{-1.0f, -1.0f, 0.0f}, // 0
+	//	{ 0.0f,  1.0f, 0.0f}, // 1
+	//	{ 1.0f, -1.0f, 0.0f}  // 2
+	//};
+
 	struct Vertex
 	{
-		float x, y, z;
+		float position[3];
+		float color[3];
 	};
 
 	Vertex vertices[3] =
-	{
-		{-1.0f, -1.0f, 0.0f}, // 0
-		{ 0.0f,  1.0f, 0.0f}, // 1
-		{ 1.0f, -1.0f, 0.0f}  // 2
+	{ 
+		{{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+		{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}} 
 	};
 
 	m_vertexBuffer = m_ResourceModule->CreateDefaultBuffer(sizeof(vertices), vertices);
