@@ -3,6 +3,7 @@
 
 #include "ResourceModule.h"
 #include "ReadData.h"
+#include <SimpleMath.h>
 
 D3D12Module::D3D12Module() {}
 
@@ -238,7 +239,10 @@ bool D3D12Module::CreateRootSignature()
 	bool ok = false;
 
 	CD3DX12_ROOT_SIGNATURE_DESC desc = {};
-	desc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	CD3DX12_ROOT_PARAMETER rootParameters; // required for Root Constants (cbuffer)
+
+	rootParameters.InitAsConstants(sizeof(DirectX::SimpleMath::Matrix) / sizeof(UINT32), 0); // number of 32 bit elements in a matrix
+	desc.Init(1, &rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> blob;
 	ok = SUCCEEDED(D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr));

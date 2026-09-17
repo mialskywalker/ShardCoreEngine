@@ -3,6 +3,7 @@
 
 #include "D3D12Module.h"
 #include "ResourceModule.h"
+#include <SimpleMath.h>
 
 Renderer::Renderer() {}
 
@@ -67,7 +68,19 @@ void Renderer::Render()
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
 
+	// MVP TEST
+	DirectX::SimpleMath::Matrix model = DirectX::SimpleMath::Matrix::Identity;
+	DirectX::SimpleMath::Matrix model2 = DirectX::SimpleMath::Matrix::CreateTranslation(1.0f, -1.0f, -1.0f);
+	DirectX::SimpleMath::Matrix view = DirectX::SimpleMath::Matrix::CreateLookAt(DirectX::SimpleMath::Vector3(0.0f, 10.0f, 10.0f), DirectX::SimpleMath::Vector3::Zero, DirectX::SimpleMath::Vector3::Up);
 
+	float aspect = float(m_D3D12Module->GetWidth()) / float(m_D3D12Module->GetHeight());
+	float fov = DirectX::XM_PIDIV4;
+
+	DirectX::SimpleMath::Matrix projection = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(fov, aspect, 0.1f, 1000.0f);
+
+	DirectX::SimpleMath::Matrix mvp = (model * view * projection).Transpose();
+	DirectX::SimpleMath::Matrix mvp2 = (model2 * view * projection).Transpose();
+	// MVP TEST END
 
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = m_D3D12Module->GetCurrentRTVHandle();
@@ -82,6 +95,13 @@ void Renderer::Render()
 	m_D3D12Module->GetCommandList()->SetGraphicsRootSignature(m_D3D12Module->GetRootSignature());
 	m_D3D12Module->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
+
+	// triangle 1
+	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0); // temp
+	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+
+	// triangle 2
+	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp2, 0); // temp
 	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

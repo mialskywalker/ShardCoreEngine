@@ -50,6 +50,9 @@ private:
 	ComPtr<ID3D12RootSignature>					m_RootSignature;
 	ComPtr<ID3D12PipelineState>					m_PipelineStateObject;
 
+	//ComPtr<ID3D12Resource>						m_DepthStencilBuffer;
+	//ComPtr<ID3D12DescriptorHeap>				m_DSVDescriptorHeap;
+
 private:
 	void EnableDebugLayer();
 	void EnableInfoQueue();
