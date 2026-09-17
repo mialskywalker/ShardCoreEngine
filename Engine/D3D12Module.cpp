@@ -23,8 +23,11 @@ bool D3D12Module::Init(HWND hwnd, uint32_t width, uint32_t height)
 #endif
 
 	ok = ok && CreateDevice();
-	if (ok)
-		EnableInfoQueue();
+
+#if defined(_DEBUG)
+	EnableInfoQueue();
+#endif
+
 	ok = ok && CreateCommandQueue();
 	ok = ok && CreateSwapChain();
 	ok = ok && CreateDescriptorHeaps();
