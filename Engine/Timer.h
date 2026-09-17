@@ -1,11 +1,11 @@
 #pragma once
 #include <chrono>
 
-class Time
+class Timer
 {
 public:
-	Time();
-	~Time();
+	Timer();
+	~Timer();
 
 	void Update();
 

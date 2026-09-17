@@ -2,7 +2,7 @@
 
 #include "Window.h"
 #include "Renderer.h"
-#include "Time.h"
+#include "Timer.h"
 
 class Application
 {
@@ -19,6 +19,6 @@ private:
 private:
 	bool			m_Running = true;
 	Window			m_Window;
-	Time			m_Time;
+	Timer			m_Time;
 	Renderer		m_Renderer;
 };

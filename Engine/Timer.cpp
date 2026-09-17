@@ -1,13 +1,13 @@
-#include "Time.h"
+#include "Timer.h"
 
-Time::Time()
+Timer::Timer()
 {
 	m_LastTime = std::chrono::high_resolution_clock::now();
 }
 
-Time::~Time() {}
+Timer::~Timer() {}
 
-void Time::Update()
+void Timer::Update()
 {
 	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
 	m_DeltaTime = std::chrono::duration<float>(currentTime - m_LastTime).count();
