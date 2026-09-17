@@ -84,14 +84,16 @@ void Renderer::Render()
 
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = m_D3D12Module->GetCurrentRTVHandle();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_D3D12Module->GetDSVHandle();
 
 	D3D12_VIEWPORT viewport{ 0.0, 0.0, float(m_D3D12Module->GetWidth()), float(m_D3D12Module->GetHeight()), 0.0, 1.0 };
 	D3D12_RECT scissor{ 0, 0, m_D3D12Module->GetWidth(), m_D3D12Module->GetHeight() };
 	
 	m_D3D12Module->GetCommandList()->RSSetViewports(1, &viewport);
 	m_D3D12Module->GetCommandList()->RSSetScissorRects(1, &scissor);
-	m_D3D12Module->GetCommandList()->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
-	m_D3D12Module->GetCommandList()->ClearRenderTargetView(m_D3D12Module->GetCurrentRTVHandle(), clearColor, 0, nullptr);
+	m_D3D12Module->GetCommandList()->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+	m_D3D12Module->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	m_D3D12Module->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	m_D3D12Module->GetCommandList()->SetGraphicsRootSignature(m_D3D12Module->GetRootSignature());
 	m_D3D12Module->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);

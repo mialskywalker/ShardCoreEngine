@@ -50,8 +50,8 @@ private:
 	ComPtr<ID3D12RootSignature>					m_RootSignature;
 	ComPtr<ID3D12PipelineState>					m_PipelineStateObject;
 
-	//ComPtr<ID3D12Resource>						m_DepthStencilBuffer;
-	//ComPtr<ID3D12DescriptorHeap>				m_DSVDescriptorHeap;
+	ComPtr<ID3D12Resource>						m_DepthStencilBuffer;
+	ComPtr<ID3D12DescriptorHeap>				m_DSVDescriptorHeap;
 
 private:
 	void EnableDebugLayer();
@@ -62,6 +62,7 @@ private:
 	bool CreateSwapChain();
 	bool CreateDescriptorHeaps();
 	bool CreateRenderTargetViews();
+	bool CreateDepthStencilView();
 
 	bool CreateCommandAllocators();
 	bool CreateCommandList();
@@ -91,6 +92,7 @@ public:
 	uint32_t						GetCurrentFrameIndex() const { return m_CurrentFrameIndex; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetCurrentRTVHandle() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetDSVHandle() const;
 
 	ID3D12RootSignature*			GetRootSignature() const { return m_RootSignature.Get(); }
 	ID3D12PipelineState*			GetPipelineStateObject() const { return m_PipelineStateObject.Get(); }

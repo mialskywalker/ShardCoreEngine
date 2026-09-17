@@ -33,6 +33,7 @@ bool D3D12Module::Init(HWND hwnd, uint32_t width, uint32_t height)
 	ok = ok && CreateSwapChain();
 	ok = ok && CreateDescriptorHeaps();
 	ok = ok && CreateRenderTargetViews();
+	ok = ok && CreateDepthStencilView();
 	ok = ok && CreateCommandAllocators();
 	ok = ok && CreateCommandList();
 	ok = ok && CreateFence();
@@ -157,7 +158,18 @@ bool D3D12Module::CreateDescriptorHeaps()
 	else
 		Logger::Log("RTV Descriptor Heap creation failed");
 
-	// to add depth/stencil etc.
+	// DSV
+	D3D12_DESCRIPTOR_HEAP_DESC descDSV = {};
+	descDSV.NumDescriptors = 1;
+	descDSV.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	descDSV.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+
+	ok = ok && SUCCEEDED(m_Device->CreateDescriptorHeap(&descDSV, IID_PPV_ARGS(&m_DSVDescriptorHeap)));
+
+	if (ok)
+		Logger::Log("DSV Descriptor Heap created");
+	else
+		Logger::Log("DSV Descriptor Heap creation failed");
 
 	return ok;
 }
@@ -183,6 +195,27 @@ bool D3D12Module::CreateRenderTargetViews()
 	}
 
 	Logger::Log("RTVs created");
+	return ok;
+}
+
+bool D3D12Module::CreateDepthStencilView()
+{
+	CD3DX12_HEAP_PROPERTIES props = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, GetWidth(), GetHeight(), 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	clearValue.DepthStencil.Depth = 1.0f;
+	clearValue.DepthStencil.Stencil = 0;
+
+	bool ok = SUCCEEDED(m_Device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearValue, IID_PPV_ARGS(&m_DepthStencilBuffer)));
+	m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, GetDSVHandle());
+
+	if (ok)
+		Logger::Log("DSV created");
+	else
+		Logger::Log("DSV creation failed");
+
 	return ok;
 }
 
@@ -275,6 +308,8 @@ bool D3D12Module::CreatePipelineStateObject()
 	desc.InputLayout = { layout, sizeof(layout) / sizeof(D3D12_INPUT_ELEMENT_DESC) };
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	desc.NumRenderTargets = 1;
 	desc.SampleDesc = { 1, 0 };
 	desc.SampleMask = 0xffffffff;
@@ -316,4 +351,9 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3D12Module::GetCurrentRTVHandle() const
 	handle.ptr += m_CurrentFrameIndex * m_RTVDescriptorSize;
 
 	return handle;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE D3D12Module::GetDSVHandle() const
+{
+	return m_DSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 }
