@@ -48,7 +48,7 @@ void Renderer::PreRender()
 	m_D3D12Module->BeginFrame();
 }
 
-void Renderer::Render(const Camera& camera)
+void Renderer::Render(Camera& camera)
 {
 	// PreRender
 	PreRender();

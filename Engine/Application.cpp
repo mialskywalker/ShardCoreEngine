@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Logger.h"
 #include "Camera.h"
+#include "Input.h"
 
 Application::Application() {}
 
@@ -9,8 +10,9 @@ Application::~Application() {}
 void Application::Run()
 {
 	m_Window.Init();
-	m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
+	Input::Initialize(m_Window.GetHandle());
 	m_Camera.Init();
+	m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
 	while (m_Running)
 	{
@@ -27,6 +29,7 @@ void Application::Run()
 
 void Application::Update()
 {
+	m_Camera.Update(m_Timer.GetDeltaTime());
 }
 
 void Application::Render()

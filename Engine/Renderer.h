@@ -24,7 +24,7 @@ public:
 	bool Init(HWND hwnd, uint32_t width, uint32_t height);
 
 	void PreRender();
-	void Render(const Camera& camera);
+	void Render(Camera& camera);
 	void PostRender();
 
 private:
