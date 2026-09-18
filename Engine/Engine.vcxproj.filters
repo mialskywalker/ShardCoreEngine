@@ -83,6 +83,9 @@
     <ClInclude Include="Input.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="InputCodes.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc" />

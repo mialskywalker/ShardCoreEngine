@@ -157,6 +157,7 @@
     <ClInclude Include="D3D12Module.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="InputCodes.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="ReadData.h" />
     <ClInclude Include="Renderer.h" />

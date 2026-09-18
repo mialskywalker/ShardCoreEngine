@@ -31,6 +31,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEHOVER:
 		DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
 		break;
+	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+		DirectX::Keyboard::ProcessMessage(msg, wParam, lParam);
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;

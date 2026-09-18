@@ -17,7 +17,7 @@ public:
 	void SetTarget(const Vector3 target);
 
 private:
-	const float MOVE_SPEED = 0.01f;
+	const float MOVE_SPEED = 2.0f;
 
 	Matrix						m_View;
 	Matrix						m_Projection;
