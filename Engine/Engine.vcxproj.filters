@@ -19,6 +19,9 @@
     <Filter Include="Resources\Icons">
       <UniqueIdentifier>{4b80bf0f-e94b-4f76-b787-809dfe973e4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{b6809449-87bd-4465-aa7c-aa64496a344b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -41,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="D3D12Module.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +74,9 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="ReadData.h" />
+    <ClInclude Include="Camera.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine.rc" />

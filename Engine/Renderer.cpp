@@ -3,6 +3,7 @@
 
 #include "D3D12Module.h"
 #include "ResourceModule.h"
+#include "Camera.h"
 #include <SimpleMath.h>
 
 Renderer::Renderer() {}
@@ -20,19 +21,6 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	// ResourceModule init
 	m_ResourceModule = std::make_unique<ResourceModule>();
 	ok = ok && m_ResourceModule->Init(m_D3D12Module.get());
-
-	// try to render a triangle
-	//struct Vertex
-	//{
-	//	float position[3];
-	//};
-
-	//Vertex vertices[3] =
-	//{
-	//	{-1.0f, -1.0f, 0.0f}, // 0
-	//	{ 0.0f,  1.0f, 0.0f}, // 1
-	//	{ 1.0f, -1.0f, 0.0f}  // 2
-	//};
 
 	struct Vertex
 	{
@@ -60,7 +48,7 @@ void Renderer::PreRender()
 	m_D3D12Module->BeginFrame();
 }
 
-void Renderer::Render()
+void Renderer::Render(const Camera& camera)
 {
 	// PreRender
 	PreRender();
@@ -71,15 +59,9 @@ void Renderer::Render()
 	// MVP TEST
 	DirectX::SimpleMath::Matrix model = DirectX::SimpleMath::Matrix::Identity;
 	DirectX::SimpleMath::Matrix model2 = DirectX::SimpleMath::Matrix::CreateTranslation(1.0f, -1.0f, -1.0f);
-	DirectX::SimpleMath::Matrix view = DirectX::SimpleMath::Matrix::CreateLookAt(DirectX::SimpleMath::Vector3(0.0f, 10.0f, 10.0f), DirectX::SimpleMath::Vector3::Zero, DirectX::SimpleMath::Vector3::Up);
-
-	float aspect = float(m_D3D12Module->GetWidth()) / float(m_D3D12Module->GetHeight());
-	float fov = DirectX::XM_PIDIV4;
-
-	DirectX::SimpleMath::Matrix projection = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(fov, aspect, 0.1f, 1000.0f);
-
-	DirectX::SimpleMath::Matrix mvp = (model * view * projection).Transpose();
-	DirectX::SimpleMath::Matrix mvp2 = (model2 * view * projection).Transpose();
+	
+	DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
+	DirectX::SimpleMath::Matrix mvp2 = (model2 * camera.GetView() * camera.GetProjection()).Transpose();
 	// MVP TEST END
 
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };

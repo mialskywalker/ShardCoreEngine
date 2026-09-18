@@ -13,6 +13,7 @@ using Microsoft::WRL::ComPtr;
 
 class D3D12Module;
 class ResourceModule;
+class Camera;
 
 class Renderer
 {
@@ -23,14 +24,14 @@ public:
 	bool Init(HWND hwnd, uint32_t width, uint32_t height);
 
 	void PreRender();
-	void Render();
+	void Render(const Camera& camera);
 	void PostRender();
 
 private:
 	// Modules
 	std::unique_ptr<D3D12Module>				m_D3D12Module;
 	std::unique_ptr<ResourceModule>				m_ResourceModule;
-
+	
 public:
 	D3D12Module* GetD3D12() const { return m_D3D12Module.get(); }
 
