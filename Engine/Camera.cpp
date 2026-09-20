@@ -8,15 +8,15 @@ Camera::Camera() {}
 
 Camera::~Camera() {}
 
-bool Camera::Init()
+bool Camera::Init(uint32_t width, uint32_t height)
 {
 	m_CurrentPosition = m_StartingPosition;
-	m_View = Matrix::CreateLookAt(m_CurrentPosition, m_Target, Vector3::Up);
+	m_CurrentRotation = m_StartingRotation;
 
-	if (m_AspectRatio <= 0.0f)
-		SetAspectRatio(float(1280) / float(720));
+	SetAspectRatio(float(width) / float(height));
 	SetFOV(DirectX::XM_PIDIV4);
-
+	
+	m_View = Matrix::CreateLookAt(m_CurrentPosition, m_Target, Vector3::Up);
 	m_Projection = Matrix::CreatePerspectiveFieldOfView(m_FOV, m_AspectRatio, 0.1f, 1000.0f);
 
 	Logger::Log("Camera initialized");
@@ -30,16 +30,20 @@ void Camera::Update(float deltaTime)
 
 	int mouseScrollWheel = Input::GetMouseWheelValue();
 
+	// Hold Mouse Right-click
 	if (Input::IsMouseButtonDown(MouseButton::Right))
 	{
+		// Mouse movement = camera rotation
 		rotate.x = float(mousePosX - Input::GetMouseDeltaX()) * 0.15f;
 		rotate.y = float(mousePosY - Input::GetMouseDeltaY()) * 0.15f;
 
+		// Left-Shift increases the camera speed
 		if (Input::IsKeyDown(KeyCode::LeftShift))
 			speed = 3;
 		else
 			speed = 1;
 
+		// Camera movement
 		if (Input::IsKeyDown(KeyCode::W)) m_CurrentPosition -= Vector3::Transform(Vector3(0, 0, 1), m_CurrentRotation) * MOVE_SPEED * deltaTime * speed;
 		if (Input::IsKeyDown(KeyCode::S)) m_CurrentPosition += Vector3::Transform(Vector3(0, 0, 1), m_CurrentRotation) * MOVE_SPEED * deltaTime * speed;
 		if (Input::IsKeyDown(KeyCode::A)) m_CurrentPosition -= Vector3::Transform(Vector3(1, 0, 0), m_CurrentRotation) * MOVE_SPEED * deltaTime * speed;
@@ -48,6 +52,7 @@ void Camera::Update(float deltaTime)
 		if (Input::IsKeyDown(KeyCode::E)) m_CurrentPosition += Vector3::Transform(Vector3(0, 1, 0), m_CurrentRotation) * MOVE_SPEED * deltaTime * speed;
 	}
 
+	// Reset Camera position + rotation
 	if (Input::IsKeyDown(KeyCode::F))
 	{
 		m_CurrentPosition = m_StartingPosition;
@@ -57,8 +62,8 @@ void Camera::Update(float deltaTime)
 		return;
 	}
 
+	// Mouse scroll - Camera Zoom in/out
 	if (mouseScrollWheel > prevWheel) m_CurrentPosition -= Vector3::Transform(Vector3(0, 0, 1), m_CurrentRotation);
-
 	if (mouseScrollWheel < prevWheel) m_CurrentPosition += Vector3::Transform(Vector3(0, 0, 1), m_CurrentRotation);
 
 	prevWheel = mouseScrollWheel;

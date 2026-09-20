@@ -11,7 +11,7 @@ void Application::Run()
 {
 	m_Window.Init();
 	Input::Initialize(m_Window.GetHandle());
-	m_Camera.Init();
+	m_Camera.Init(m_Window.GetWidth(), m_Window.GetHeight());
 	m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
 	while (m_Running)

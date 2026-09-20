@@ -10,7 +10,7 @@ void Input::Initialize(HWND hWnd)
 	mouse->SetWindow(hWnd);
 }
 
-bool Input::IsKeyDown(KeyCode key)
+bool Input::IsKeyDown(KeyCode key) // When a keyboard key is pressed
 {
 	const DirectX::Keyboard::State& keyState = keyboard.get()->GetState();
 	
@@ -32,16 +32,12 @@ bool Input::IsKeyDown(KeyCode key)
 		return keyState.F;
 	case KeyCode::LeftShift:
 		return keyState.LeftShift;
-	case KeyCode::Space:
-		return keyState.Space;
-	case KeyCode::Escape:
-		return keyState.Escape;
 	default:
 		return false;
 	}
 }
 
-bool Input::IsMouseButtonDown(MouseButton button)
+bool Input::IsMouseButtonDown(MouseButton button) // When a mouse button is pressed
 {
 	const DirectX::Mouse::State& mouseState = mouse.get()->GetState();
 
@@ -58,19 +54,19 @@ bool Input::IsMouseButtonDown(MouseButton button)
 	}
 }
 
-const int Input::GetMouseDeltaX()
+const int Input::GetMouseDeltaX() // Get mouse position x
 {
 	const DirectX::Mouse::State& mouseState = mouse.get()->GetState();
 	return mouseState.x;
 }
 
-const int Input::GetMouseDeltaY()
+const int Input::GetMouseDeltaY() // Get mouse position y
 {
 	const DirectX::Mouse::State& mouseState = mouse.get()->GetState();
 	return mouseState.y;
 }
 
-const int Input::GetMouseWheelValue()
+const int Input::GetMouseWheelValue() // Get mouse scroll wheel value
 {
 	const DirectX::Mouse::State& mouseState = mouse.get()->GetState();
 	return mouseState.scrollWheelValue;

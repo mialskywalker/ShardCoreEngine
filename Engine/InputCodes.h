@@ -1,5 +1,5 @@
 #pragma once
-enum class KeyCode
+enum class KeyCode // Keyboard
 {
 	W,
 	A,
@@ -9,11 +9,9 @@ enum class KeyCode
 	E,
 	F,
 	LeftShift,
-	Space,
-	Escape
 };
 
-enum class MouseButton
+enum class MouseButton // Mouse
 {
 	Left,
 	Right,

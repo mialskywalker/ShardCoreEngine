@@ -9,7 +9,7 @@ public:
 	Camera();
 	~Camera();
 
-	bool Init();
+	bool Init(uint32_t width, uint32_t height);
 	void Update(float deltaTime);
 
 	void SetAspectRatio(float newAspectRatio);
@@ -17,16 +17,16 @@ public:
 	void SetTarget(const Vector3 target);
 
 private:
-	const float MOVE_SPEED = 2.0f;
+	const float					MOVE_SPEED = 2.0f;
 
 	Matrix						m_View;
 	Matrix						m_Projection;
 
-	Vector3						m_StartingPosition = Vector3(0.0f, 5.0f, 5.0f);
+	Vector3						m_StartingPosition = Vector3(0.0f, 1.0f, 10.0f);
 	Vector3						m_CurrentPosition = Vector3::Zero;
 	Vector3						m_Target = Vector3::Zero;
 
-	Quaternion					m_StartingRotation;
+	Quaternion					m_StartingRotation = Quaternion::Identity;
 	Quaternion					m_CurrentRotation;
 
 	float						m_AspectRatio = 0.0f;
@@ -49,5 +49,4 @@ public:
 	const Vector3 GetTarget() { return m_Target; }
 
 	const float getMoveSpeed() { return MOVE_SPEED; }
-
 };
