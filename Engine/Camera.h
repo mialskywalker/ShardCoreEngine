@@ -35,10 +35,10 @@ private:
 	float						yaw = 0.0f;
 	float						pitch = 0.0f;
 
-	float						mousePosX = 0.0f;
-	float						mousePosY = 0.0f;
+	int							mousePosX = 0;
+	int							mousePosY = 0;
 
-	int							speed = 1;
+	float						speed = 1.0f;
 	int							prevWheel = 0;
 
 public:

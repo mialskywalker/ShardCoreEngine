@@ -39,9 +39,9 @@ void Camera::Update(float deltaTime)
 
 		// Left-Shift increases the camera speed
 		if (Input::IsKeyDown(KeyCode::LeftShift))
-			speed = 3;
+			speed = 3.0f;
 		else
-			speed = 1;
+			speed = 1.0f;
 
 		// Camera movement
 		if (Input::IsKeyDown(KeyCode::W)) m_CurrentPosition -= Vector3::Transform(Vector3(0, 0, 1), m_CurrentRotation) * MOVE_SPEED * deltaTime * speed;
