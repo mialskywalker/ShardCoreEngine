@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "Timer.h"
+#include "Camera.h"
 
 class Application
 {
@@ -19,6 +20,9 @@ private:
 private:
 	bool			m_Running = true;
 	Window			m_Window;
-	Timer			m_Time;
+	Timer			m_Timer;
 	Renderer		m_Renderer;
+	Camera			m_Camera;
+
+	float fov = 0.78f;
 };

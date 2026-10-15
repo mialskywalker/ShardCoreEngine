@@ -1,3 +1,8 @@
+cbuffer Transforms : register(b0)
+{
+    float4x4 mvp;
+};
+
 struct VertexInput
 {
     float3 inPos : POSITION;
@@ -16,7 +21,7 @@ VertexOutput main(VertexInput vertexInput)
     float3 inPos = vertexInput.inPos;
     
     VertexOutput output;
-    output.position = float4(inPos, 1.0f);
+    output.position = mul(float4(inPos, 1.0f), mvp);
     output.color = inColor;
     return output;
 }
