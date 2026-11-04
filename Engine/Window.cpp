@@ -10,6 +10,20 @@ Window::~Window() {}
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (msg == WM_NCCREATE)
+	{
+		auto* createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
+		auto* window = static_cast<Window*>(createStruct->lpCreateParams);
+
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
+	}
+
+	auto* window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	if (window && window->ForwardMessage(hwnd, msg, wParam, lParam))
+	{
+		return 0;
+	}
+
 	switch (msg)
 	{
 	case WM_ACTIVATE:
@@ -71,7 +85,7 @@ bool Window::Init()
 		nullptr,
 		nullptr,
 		hInstance,
-		nullptr
+		this
 	);
 	
 	if (!m_Hwnd)
@@ -98,4 +112,19 @@ bool Window::ProcessEvents()
 	}
 
 	return true;
+}
+
+void Window::SetMessageCallback(const std::function<bool(HWND, UINT, WPARAM, LPARAM)>& callback)
+{
+	m_MessageCallback = callback;
+}
+
+bool Window::ForwardMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (m_MessageCallback)
+	{
+		return m_MessageCallback(hwnd, msg, wParam, lParam);
+	}
+
+	return false;
 }

@@ -2,12 +2,18 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
-void Input::Initialize(HWND hWnd)
+bool Input::Initialize(HWND hWnd)
 {
 	keyboard = std::make_unique<DirectX::Keyboard>();
 	mouse = std::make_unique<DirectX::Mouse>();
 
-	mouse->SetWindow(hWnd);
+	if (keyboard && mouse)
+	{
+		mouse->SetWindow(hWnd);
+		return true;
+	}
+
+	return false;
 }
 
 bool Input::IsKeyDown(KeyCode key) // When a keyboard key is pressed

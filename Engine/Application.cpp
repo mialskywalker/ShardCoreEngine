@@ -7,13 +7,18 @@ Application::Application() {}
 
 Application::~Application() {}
 
+bool Application::Init()
+{
+	bool ok = m_Window.Init();
+	ok = ok && Input::Initialize(m_Window.GetHandle());
+	ok = ok && m_Camera.Init(m_Window.GetWidth(), m_Window.GetHeight());
+	ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
+
+	return ok;
+}
+
 void Application::Run()
 {
-	m_Window.Init();
-	Input::Initialize(m_Window.GetHandle());
-	m_Camera.Init(m_Window.GetWidth(), m_Window.GetHeight());
-	m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
-
 	while (m_Running)
 	{
 		m_Running = m_Window.ProcessEvents();
@@ -34,5 +39,10 @@ void Application::Update()
 
 void Application::Render()
 {
+	m_Renderer.PreRender();
 	m_Renderer.Render(m_Camera);
+
+	OnRenderOverlay();
+
+	m_Renderer.PostRender();
 }

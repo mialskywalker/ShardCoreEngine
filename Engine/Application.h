@@ -9,9 +9,17 @@ class Application
 {
 public:
 	Application();
-	~Application();
+	virtual ~Application();
 
+	bool Init();
 	void Run();
+
+protected:
+	virtual void OnRenderOverlay() {}
+
+public:
+	Window& GetWindow() { return m_Window; }
+	Renderer& GetRenderer() { return m_Renderer; }
 	
 private:
 	void Update();

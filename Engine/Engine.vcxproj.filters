@@ -51,6 +51,9 @@
     <ClCompile Include="Input.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderDescriptorModule.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="InputCodes.h">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderDescriptorModule.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 
 #include "D3D12Module.h"
 #include "ResourceModule.h"
+#include "ShaderDescriptorModule.h"
 #include "Camera.h"
 #include <SimpleMath.h>
 
@@ -21,6 +22,10 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	// ResourceModule init
 	m_ResourceModule = std::make_unique<ResourceModule>();
 	ok = ok && m_ResourceModule->Init(m_D3D12Module.get());
+
+	// ShaderDescriptorModule init
+	m_ShaderDescriptorModule = std::make_unique<ShaderDescriptorModule>();
+	ok = ok && m_ShaderDescriptorModule->Init(*m_D3D12Module);
 
 	struct Vertex
 	{
@@ -46,16 +51,13 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 void Renderer::PreRender()
 {
 	m_D3D12Module->BeginFrame();
+
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
 }
 
 void Renderer::Render(Camera& camera)
 {
-	// PreRender
-	PreRender();
-
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
-
 	// MVP TEST
 	DirectX::SimpleMath::Matrix model = DirectX::SimpleMath::Matrix::Identity;
 	DirectX::SimpleMath::Matrix model2 = DirectX::SimpleMath::Matrix::CreateTranslation(1.0f, -1.0f, -1.0f);
@@ -87,8 +89,11 @@ void Renderer::Render(Camera& camera)
 	// triangle 2
 	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp2, 0); // temp
 	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+}
 
-	barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+void Renderer::PostRender()
+{
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
 
 	m_D3D12Module->GetCommandList()->Close();
@@ -96,14 +101,9 @@ void Renderer::Render(Camera& camera)
 	ID3D12CommandList* commandLists[] = { m_D3D12Module->GetCommandList() };
 	m_D3D12Module->GetCommandQueue()->ExecuteCommandLists(1, commandLists);
 
-	// PostRender
-	PostRender();
+	// D3D12 EndFrame
+	m_D3D12Module->EndFrame();
 
 	// Flush
 	m_D3D12Module->WaitForGPU();
-}
-
-void Renderer::PostRender()
-{
-	m_D3D12Module->EndFrame();
 }

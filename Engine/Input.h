@@ -8,7 +8,7 @@ namespace DirectX { class Keyboard; class Mouse; }
 class Input
 {
 public:
-	static void Initialize(HWND hWnd);
+	static bool Initialize(HWND hWnd);
 	static bool IsKeyDown(KeyCode key);
 	static bool IsMouseButtonDown(MouseButton button);
 	static const int GetMouseDeltaX();

@@ -1,8 +1,14 @@
-#include "Application.h"
+#include "EditorApplication.h"
 
 int main()
 {
-	Application app;
+	EditorApplication app;
+	
+	if (!app.Init())
+	{
+		return 1;
+	}
+
 	app.Run();
 
 	return 0;
