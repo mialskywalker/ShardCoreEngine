@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK12", "External\DirectXTK12\DirectXTK_Desktop_2022_Win10.vcxproj", "{3E0E8608-CD9B-4C76-AF33-29CA38F2C9F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Games\Sandbox\Sandbox.vcxproj", "{DA336DD0-5454-4967-B04D-647764157944}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShardCoreEditor", "Editor\Sandbox.vcxproj", "{DA336DD0-5454-4967-B04D-647764157944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
