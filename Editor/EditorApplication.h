@@ -7,7 +7,7 @@ class EditorApplication : public Application
 {
 public:
     bool Init();
-    ~EditorApplication() override;
+    ~EditorApplication() override; // we call this after rendering the scene and before PostRender
 
 protected:
     void OnRenderOverlay() override;

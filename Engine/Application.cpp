@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "Camera.h"
 #include "Input.h"
+#include "D3D12Module.h"
 
 Application::Application() {}
 
@@ -23,6 +24,12 @@ void Application::Run()
 	{
 		m_Running = m_Window.ProcessEvents();
 		m_Timer.Update();
+
+		if (m_Window.ConsumeResize())
+		{
+			Logger::Log("Window resized!");
+			m_Renderer.GetD3D12()->Resize();
+		}
 
 		Update();
 		Render();

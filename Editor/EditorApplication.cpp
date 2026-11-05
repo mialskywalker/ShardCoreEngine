@@ -13,11 +13,13 @@ EditorApplication::~EditorApplication()
 
 bool EditorApplication::Init()
 {
+	// Initialize Application
 	if (!Application::Init())
 	{
 		return false;
 	}
 
+	// Initialize EditorUI (ImGui)
 	if (!m_EditorUI.Init(
 		GetWindow().GetHandle(),
 		*GetRenderer().GetD3D12(),
@@ -26,6 +28,7 @@ bool EditorApplication::Init()
 		return false;
 	}
 
+	// Set the Message Callback
 	GetWindow().SetMessageCallback(
 		[](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) -> bool
 		{

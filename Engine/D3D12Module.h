@@ -13,7 +13,7 @@ public:
 	D3D12Module();
 	~D3D12Module();
 
-	bool Init(HWND hwnd, uint32_t width, uint32_t height);
+	bool Init(HWND hwnd);
 
 	void BeginFrame();
 	void EndFrame();
@@ -72,6 +72,9 @@ private:
 	bool CreateRootSignature();
 	bool CreatePipelineStateObject();
 
+private:
+	void GetWindowSize(uint32_t& width, uint32_t& height);
+
 public:
 	HWND							GetHWND() const { return m_Hwnd; }
 	uint32_t						GetWidth() const { return m_Width; }
@@ -98,4 +101,6 @@ public:
 	ID3D12PipelineState*			GetPipelineStateObject() const { return m_PipelineStateObject.Get(); }
 
 	void							WaitForGPU();
+	void							Resize();
+	//void							ToggleFullscreen();
 };

@@ -9,12 +9,11 @@ D3D12Module::D3D12Module() {}
 
 D3D12Module::~D3D12Module() {}
 
-bool D3D12Module::Init(HWND hwnd, uint32_t width, uint32_t height)
+bool D3D12Module::Init(HWND hwnd)
 {
 	// Window init
 	m_Hwnd = hwnd;
-	m_Width = width;
-	m_Height = height;
+	GetWindowSize(m_Width, m_Height);
 
 	// DX12 init pipeline
 	bool ok = true;
@@ -124,7 +123,7 @@ bool D3D12Module::CreateSwapChain()
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	desc.BufferCount = m_FramesInFlight;
 
-	desc.Scaling = DXGI_SCALING_STRETCH;
+	desc.Scaling = DXGI_SCALING_NONE;
 	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
@@ -326,6 +325,15 @@ bool D3D12Module::CreatePipelineStateObject()
 	return ok;
 }
 
+void D3D12Module::GetWindowSize(uint32_t& width, uint32_t& height)
+{
+	RECT clientRect = {};
+	GetClientRect(m_Hwnd, &clientRect);
+
+	width = clientRect.right - clientRect.left;
+	height = clientRect.bottom - clientRect.top;
+}
+
 void D3D12Module::WaitForGPU()
 {
 	// tell the gpu queue when it reaches this value that the cpu can continue after that
@@ -342,6 +350,44 @@ void D3D12Module::WaitForGPU()
 
 	// start a new frame
 	m_FenceValue++;
+}
+
+void D3D12Module::Resize()
+{
+	uint32_t width, height;
+	GetWindowSize(width, height);
+
+	if (width == 0 || height == 0)
+	{
+		return;
+	}
+
+	if (width != m_Width || height != m_Height)
+	{
+		m_Width = width;
+		m_Height = height;
+
+		WaitForGPU();
+
+		for (uint32_t i = 0; i < m_FramesInFlight; ++i)
+		{
+			m_BackBuffers[i].Reset();
+			m_DepthStencilBuffer.Reset();
+		}
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+
+		bool ok = SUCCEEDED(m_SwapChain->GetDesc(&swapChainDesc));
+		ok = ok && SUCCEEDED(m_SwapChain->ResizeBuffers(m_FramesInFlight, m_Width, m_Height, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags));
+
+		m_CurrentFrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
+
+		if (m_Width > 0 && m_Height > 0)
+		{
+			ok = ok && CreateRenderTargetViews();
+			ok = ok && CreateDepthStencilView();
+		}
+	}
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE D3D12Module::GetCurrentRTVHandle() const

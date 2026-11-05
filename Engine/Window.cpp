@@ -51,6 +51,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSKEYUP:
 		DirectX::Keyboard::ProcessMessage(msg, wParam, lParam);
 		break;
+	case WM_SIZE:
+		if (window && wParam != SIZE_MINIMIZED)
+		{
+			window->SetSize(LOWORD(lParam), HIWORD(lParam));
+		}
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -91,6 +97,13 @@ bool Window::Init()
 	if (!m_Hwnd)
 		return false;
 
+	// Get Window Size
+	RECT rect;
+	GetClientRect(m_Hwnd, &rect);
+
+	m_Width = rect.right - rect.left;
+	m_Height = rect.bottom - rect.top;
+
 	ShowWindow(m_Hwnd, SW_SHOW);
 
 	Logger::Log("Window initialization successful!"); // Debug log
@@ -111,6 +124,24 @@ bool Window::ProcessEvents()
 			return false;
 	}
 
+	return true;
+}
+
+void Window::SetSize(uint32_t width, uint32_t height)
+{
+	m_Width = width;
+	m_Height = height;
+	m_Resized = true;
+}
+
+bool Window::ConsumeResize()
+{
+	if (!m_Resized)
+	{
+		return false;
+	}
+
+	m_Resized = false;
 	return true;
 }
 
