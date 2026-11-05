@@ -10,7 +10,9 @@ public:
     ~EditorApplication() override; // we call this after rendering the scene and before PostRender
 
 protected:
+    void OnBeginFrame() override;
     void OnRenderOverlay() override;
+    bool CanUpdateCamera() const override;
 
 private:
     EditorUI m_EditorUI;

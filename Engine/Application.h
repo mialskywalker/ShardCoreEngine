@@ -15,7 +15,9 @@ public:
 	void Run();
 
 protected:
+	virtual void OnBeginFrame() {}
 	virtual void OnRenderOverlay() {}
+	virtual bool CanUpdateCamera() const { return true; }
 
 public:
 	Window& GetWindow() { return m_Window; }

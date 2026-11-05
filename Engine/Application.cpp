@@ -31,6 +31,8 @@ void Application::Run()
 			m_Renderer.GetD3D12()->Resize();
 		}
 
+		OnBeginFrame();
+
 		Update();
 		Render();
 	}
@@ -41,7 +43,10 @@ void Application::Run()
 
 void Application::Update()
 {
-	m_Camera.Update(m_Timer.GetDeltaTime());
+	if (CanUpdateCamera())
+	{
+		m_Camera.Update(m_Timer.GetDeltaTime());
+	}
 }
 
 void Application::Render()

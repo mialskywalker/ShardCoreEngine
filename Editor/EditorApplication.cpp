@@ -40,9 +40,24 @@ bool EditorApplication::Init()
 	return true;
 }
 
-void EditorApplication::OnRenderOverlay()
+void EditorApplication::OnBeginFrame()
 {
 	m_EditorUI.BeginFrame();
-	ImGui::ShowDemoWindow();
-	m_EditorUI.Render(GetRenderer().GetD3D12()->GetCommandList(), *GetRenderer().GetShaderDescriptors());
+}
+
+void EditorApplication::OnRenderOverlay()
+{
+	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
+	ImGui::ShowDemoWindow(); // Demo Window
+	m_EditorUI.Render(GetRenderer().GetD3D12()->GetCommandList(), *GetRenderer().GetShaderDescriptors()); // Render ImGui
+}
+
+bool EditorApplication::CanUpdateCamera() const
+{
+	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) // Capture clicks and keys on ImGui windows instead of scene
+	{
+		return false;
+	}
+
+	return true;
 }
