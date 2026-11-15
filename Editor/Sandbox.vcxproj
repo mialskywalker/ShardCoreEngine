@@ -154,6 +154,7 @@
     <ClCompile Include="EditorApplication.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="WindowLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
@@ -172,6 +173,7 @@
     <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="EditorUI.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="WindowLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ShardCoreEditor.rc" />

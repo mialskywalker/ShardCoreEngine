@@ -106,7 +106,7 @@ bool Window::Init()
 
 	ShowWindow(m_Hwnd, SW_SHOW);
 
-	Logger::Log("Window initialization successful!"); // Debug log
+	Logger::Log("Window initialization successful!", LogType::Engine); // Debug log
 
 	return true;
 }

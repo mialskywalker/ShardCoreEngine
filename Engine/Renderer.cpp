@@ -17,7 +17,7 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	m_D3D12Module = std::make_unique<D3D12Module>();
 	bool ok = m_D3D12Module->Init(hwnd);
 	if (ok)
-		Logger::Log("DirectX 12 Initialization success!");
+		Logger::Log("DirectX 12 Initialization success!", LogType::Engine);
 
 	// ResourceModule init
 	m_ResourceModule = std::make_unique<ResourceModule>();

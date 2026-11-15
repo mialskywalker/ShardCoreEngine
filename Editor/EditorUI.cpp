@@ -3,6 +3,7 @@
 #include "ShaderDescriptorModule.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+#include "WindowLogger.h"
 
 EditorUI::EditorUI() {}
 
@@ -73,6 +74,9 @@ bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descr
 		return false;
 	}
 
+	// init members
+	m_WindowLogger = std::make_unique<WindowLogger>();
+
 	return true;
 }
 
@@ -99,4 +103,9 @@ void EditorUI::Shutdown()
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void EditorUI::Draw()
+{
+	m_WindowLogger->Draw();
 }

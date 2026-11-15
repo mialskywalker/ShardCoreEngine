@@ -1,11 +1,13 @@
 #pragma once
 
 #include <Windows.h>
+#include <memory>
 #include "d3dx12.h"
 #include "imgui.h"
 
 class D3D12Module;
 class ShaderDescriptorModule;
+class WindowLogger;
 
 class EditorUI
 {
@@ -17,4 +19,10 @@ public:
 	void BeginFrame();
 	void Render(ID3D12GraphicsCommandList* commandList, ShaderDescriptorModule& descriptors);
 	void Shutdown();
+
+public:
+	void Draw();
+
+private:
+	std::unique_ptr<WindowLogger>		m_WindowLogger;
 };

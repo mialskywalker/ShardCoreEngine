@@ -19,7 +19,7 @@ bool Camera::Init(uint32_t width, uint32_t height)
 	m_View = Matrix::CreateLookAt(m_CurrentPosition, m_Target, Vector3::Up);
 	m_Projection = Matrix::CreatePerspectiveFieldOfView(m_FOV, m_AspectRatio, 0.1f, 1000.0f);
 
-	Logger::Log("Camera initialized");
+	Logger::Log("Camera initialized", LogType::Engine);
 
 	return true;
 }
