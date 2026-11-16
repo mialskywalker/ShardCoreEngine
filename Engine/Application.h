@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Timer.h"
 #include "Camera.h"
+#include <memory>
 
 class Application
 {

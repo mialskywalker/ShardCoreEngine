@@ -27,7 +27,6 @@ void Application::Run()
 
 		if (m_Window.ConsumeResize())
 		{
-			Logger::Log("Window resized!", LogType::Engine);
 			m_Renderer.GetD3D12()->Resize();
 		}
 

@@ -24,5 +24,9 @@ public:
 	void Draw();
 
 private:
+	void SetupStyle();
+	void SetupFonts();
+
+private:
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
 };
