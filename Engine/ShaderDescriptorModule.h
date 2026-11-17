@@ -34,7 +34,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE					m_CpuStart = { 0 };
 	UINT										m_DescriptorSize = 0;
 
-	int											m_HeapCapacity = 256;
+	int											m_HeapCapacity = 1024;
 	int											m_NextFreeIndex = 0;
 
 	std::vector<UINT>							m_FreeIndices;
