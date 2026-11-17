@@ -5,6 +5,7 @@
 
 using DirectX::SimpleMath::Vector3;
 using DirectX::SimpleMath::Quaternion;
+using DirectX::SimpleMath::Matrix;
 
 class TransformComponent : public Component
 {
@@ -19,6 +20,9 @@ public:
 	void SetPosition(const Vector3& newPosition) { m_Position = newPosition; }
 	void SetRotation(const Quaternion& newRotation) { m_Rotation = newRotation; }
 	void SetScale(const Vector3& newScale) { m_Scale = newScale; }
+
+	Matrix GetLocalMatrix() const;
+	Matrix GetWorldMatrix() const;
 
 private:
 	Vector3 m_Position = Vector3::Zero;
