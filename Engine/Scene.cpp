@@ -16,12 +16,25 @@ bool Scene::Init()
 
 void Scene::Update(float deltaTime)
 {
+	m_IsUpdating = true;
+
 	for (auto&& go : m_GameObjects)
 	{
 		if (go->IsActive())
 		{
 			go->Update(deltaTime);
 		}
+	}
+
+	m_IsUpdating = false;
+
+	// Process pending removals
+	std::vector<uint64_t> pending;
+	pending.swap(m_PendingRemovals);
+	
+	for (uint64_t uid : pending)
+	{
+		RemoveGameObject(uid);
 	}
 }
 
@@ -59,6 +72,18 @@ bool Scene::RemoveGameObject(uint64_t uid)
 	if (!go)
 	{
 		return false;
+	}
+
+	// Defer removal during Scene Update
+	if (m_IsUpdating)
+	{
+
+		if (std::find(m_PendingRemovals.begin(), m_PendingRemovals.end(), uid) == m_PendingRemovals.end())
+		{
+			m_PendingRemovals.push_back(uid);
+		}
+
+		return true;
 	}
 
 	// Remove all children recursively

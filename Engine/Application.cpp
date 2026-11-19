@@ -50,7 +50,7 @@ void Application::Update()
 
 void Application::Render()
 {
-	m_Renderer.PreRender();
+	m_Renderer.PreRender();	
 	m_Renderer.Render(m_Camera);
 
 	OnRenderOverlay();

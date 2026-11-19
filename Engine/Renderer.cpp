@@ -58,13 +58,9 @@ void Renderer::PreRender()
 
 void Renderer::Render(Camera& camera)
 {
-	// MVP TEST
-	DirectX::SimpleMath::Matrix model = DirectX::SimpleMath::Matrix::Identity;
-	DirectX::SimpleMath::Matrix model2 = DirectX::SimpleMath::Matrix::CreateTranslation(1.0f, -1.0f, -1.0f);
-	
+	const Matrix model = Matrix::Identity;
 	DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
-	DirectX::SimpleMath::Matrix mvp2 = (model2 * camera.GetView() * camera.GetProjection()).Transpose();
-	// MVP TEST END
+	// MVP TEST
 
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = m_D3D12Module->GetCurrentRTVHandle();
@@ -82,12 +78,8 @@ void Renderer::Render(Camera& camera)
 	m_D3D12Module->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
 
-	// triangle 1
+	// triangle
 	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0); // temp
-	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-
-	// triangle 2
-	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp2, 0); // temp
 	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
 

@@ -25,4 +25,6 @@ private:
 	std::string m_Name;
 	uint64_t m_NextUID = 1;
 	std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+	bool m_IsUpdating = false;
+	std::vector<uint64_t> m_PendingRemovals;
 };
