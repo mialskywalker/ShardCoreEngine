@@ -4,6 +4,7 @@
 #include <memory>
 #include "d3dx12.h"
 #include "imgui.h"
+#include "WindowViewport.h"
 
 class D3D12Module;
 class ShaderDescriptorModule;
@@ -25,7 +26,7 @@ public:
 	void Shutdown();
 
 public:
-	void Draw(Scene* activeScene, MeshLibrary* meshLibrary);
+	void Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture);
 
 private:
 	void SetupStyle();
@@ -35,4 +36,5 @@ private:
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
 	std::unique_ptr<WindowHierarchy>	m_WindowHierarchy;
 	std::unique_ptr<WindowInspector>	m_WindowInspector;
+	WindowViewport						m_WindowViewport;
 };

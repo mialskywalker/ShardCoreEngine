@@ -90,6 +90,9 @@
     <ClCompile Include="MeshLibrary.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -165,6 +168,9 @@
       <Filter>Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="MeshLibrary.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>

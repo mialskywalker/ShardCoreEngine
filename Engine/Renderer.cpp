@@ -4,6 +4,7 @@
 #include "D3D12Module.h"
 #include "ResourceModule.h"
 #include "ShaderDescriptorModule.h"
+#include "RenderTexture.h"
 
 #include "Camera.h"
 #include "Scene.h"
@@ -37,6 +38,10 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	m_ShaderDescriptorModule = std::make_unique<ShaderDescriptorModule>();
 	ok = ok && m_ShaderDescriptorModule->Init(*m_D3D12Module);
 
+	// RenderTexture init
+	m_SceneRenderTexture = std::make_unique<RenderTexture>();
+	ok = ok && m_SceneRenderTexture->Init(*m_D3D12Module, *m_ShaderDescriptorModule, m_D3D12Module->GetWidth(), m_D3D12Module->GetHeight());
+
 	// MeshLibrary init
 	m_MeshLibrary = std::make_unique<MeshLibrary>();
 	ok = ok && m_MeshLibrary->Init(*m_ResourceModule);
@@ -54,58 +59,8 @@ void Renderer::PreRender()
 
 void Renderer::Render(Camera& camera, Scene* scene)
 {
-	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	D3D12_CPU_DESCRIPTOR_HANDLE rtv = m_D3D12Module->GetCurrentRTVHandle();
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_D3D12Module->GetDSVHandle();
-
-	D3D12_VIEWPORT viewport{ 0.0, 0.0, float(m_D3D12Module->GetWidth()), float(m_D3D12Module->GetHeight()), 0.0, 1.0 };
-	D3D12_RECT scissor{ 0, 0, m_D3D12Module->GetWidth(), m_D3D12Module->GetHeight() };
-	
-	m_D3D12Module->GetCommandList()->RSSetViewports(1, &viewport);
-	m_D3D12Module->GetCommandList()->RSSetScissorRects(1, &scissor);
-	m_D3D12Module->GetCommandList()->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
-	m_D3D12Module->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-	m_D3D12Module->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	m_D3D12Module->GetCommandList()->SetGraphicsRootSignature(m_D3D12Module->GetRootSignature());
-	m_D3D12Module->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
-	if (scene)
-	{
-		for (const auto& go : scene->GetGameObjects())
-		{
-			if (!go->IsActive())
-			{
-				continue;
-			}
-
-			// Find MeshComponent
-			Component* comp = go->GetComponent(ComponentType::Mesh);
-			if (!comp || !comp->IsEnabled())
-			{
-				continue;
-			}
-
-			// Get Mesh
-			Mesh* m = static_cast<MeshComponent*>(comp)->GetMesh();
-			if (!m)
-			{
-				continue;
-			}
-			
-			Matrix model = go->GetTransform()->GetWorldMatrix();
-			DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
-
-			const auto& vbv = m->GetVertexBufferView();
-			const auto& ibv = m->GetIndexBufferView();
-			
-			m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
-			m_D3D12Module->GetCommandList()->IASetIndexBuffer(&ibv);
-
-			m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0);
-
-			m_D3D12Module->GetCommandList()->DrawIndexedInstanced(m->GetIndexCount(), 1, 0, 0, 0);
-		}
-	}
+	RenderSceneToTexture(camera, scene);
+	PrepareBackBuffer();
 }
 
 void Renderer::PostRender()
@@ -123,4 +78,101 @@ void Renderer::PostRender()
 
 	// Flush
 	m_D3D12Module->WaitForGPU();
+}
+
+void Renderer::RenderSceneToTexture(Camera& camera, Scene* scene)
+{
+	auto* commandList = m_D3D12Module->GetCommandList();
+
+	// Shader Resource -> Render Target
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_SceneRenderTexture->GetResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandList->ResourceBarrier(1, &barrier);
+
+	auto rtv = m_SceneRenderTexture->GetRTV();
+	auto dsv = m_SceneRenderTexture->GetDSV();
+
+	// Viewport & Scissor
+	float width = static_cast<float>(m_SceneRenderTexture->GetWidth());
+	float height = static_cast<float>(m_SceneRenderTexture->GetHeight());
+	
+	D3D12_VIEWPORT viewport = { 0.0f, 0.0f, width, height, 0.0f, 1.0f };
+	D3D12_RECT scissor = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissor);
+
+	// Bind Render Target
+	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+
+	// Clear
+	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH,	1.0f, 0, 0, nullptr);
+
+	// Draw GameObjects
+	DrawScene(camera, scene);
+
+	// Render Target -> Shader Resource
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_SceneRenderTexture->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	commandList->ResourceBarrier(1, &barrier);
+}
+
+void Renderer::DrawScene(Camera& camera, Scene* scene)
+{
+	if (!scene)
+	{
+		return;
+	}
+	
+	auto* commandList = m_D3D12Module->GetCommandList();
+	commandList->SetPipelineState(m_D3D12Module->GetPipelineStateObject());
+	commandList->SetGraphicsRootSignature(m_D3D12Module->GetRootSignature());
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	for (const auto& go : scene->GetGameObjects())
+	{
+		if (!go->IsActive())
+		{
+			continue;
+		}
+
+		// Find MeshComponent
+		Component* comp = go->GetComponent(ComponentType::Mesh);
+		if (!comp || !comp->IsEnabled())
+		{
+			continue;
+		}
+
+		// Get Mesh
+		Mesh* m = static_cast<MeshComponent*>(comp)->GetMesh();
+		if (!m)
+		{
+			continue;
+		}
+
+		Matrix model = go->GetTransform()->GetWorldMatrix();
+		DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
+
+		const auto& vbv = m->GetVertexBufferView();
+		const auto& ibv = m->GetIndexBufferView();
+
+		commandList->IASetVertexBuffers(0, 1, &vbv);
+		commandList->IASetIndexBuffer(&ibv);
+
+		commandList->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0);
+
+		commandList->DrawIndexedInstanced(m->GetIndexCount(), 1, 0, 0, 0);
+	}
+}
+
+void Renderer::PrepareBackBuffer()
+{
+	auto* commandList = m_D3D12Module->GetCommandList();
+	auto rtv = m_D3D12Module->GetCurrentRTVHandle();
+
+	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 0.1f };
+
+	commandList->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
+	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 }

@@ -154,6 +154,7 @@
     <ClCompile Include="MeshLibrary.cpp" />
     <ClCompile Include="MeshPrimitives.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="ResourceModule.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneModule.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="MeshPrimitives.h" />
     <ClInclude Include="ReadData.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceModule.h" />
     <ClInclude Include="Scene.h" />

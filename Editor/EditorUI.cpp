@@ -116,11 +116,12 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary)
+void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture)
 {
 	m_WindowLogger->Draw();
 	m_WindowHierarchy->Draw(activeScene);
 	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID(), meshLibrary);
+	m_WindowViewport.Draw(renderTexture);
 }
 
 void EditorUI::SetupStyle()

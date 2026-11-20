@@ -64,6 +64,9 @@
     <ClCompile Include="WindowInspector.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="WindowViewport.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\imgui\imconfig.h">
@@ -106,6 +109,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="WindowInspector.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowViewport.h">
       <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>
