@@ -163,6 +163,7 @@
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WindowHierarchy.cpp" />
+    <ClCompile Include="WindowInspector.cpp" />
     <ClCompile Include="WindowLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +184,7 @@
     <ClInclude Include="EditorUI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="WindowHierarchy.h" />
+    <ClInclude Include="WindowInspector.h" />
     <ClInclude Include="WindowLogger.h" />
   </ItemGroup>
   <ItemGroup>

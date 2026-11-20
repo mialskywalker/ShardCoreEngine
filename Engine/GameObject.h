@@ -37,6 +37,7 @@ public:
 	// Components
 	Component* AddComponent(ComponentType type);
 	Component* GetComponent(ComponentType type) const;
+	bool RemoveComponent(ComponentType type);
 
 	TransformComponent* GetTransform() const;
 

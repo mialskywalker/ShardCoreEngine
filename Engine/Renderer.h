@@ -15,8 +15,8 @@ class D3D12Module;
 class ResourceModule;
 class ShaderDescriptorModule;
 class Camera;
-class Mesh;
 class Scene;
+class MeshLibrary;
 
 class Renderer
 {
@@ -40,7 +40,8 @@ public:
 	D3D12Module* GetD3D12() const { return m_D3D12Module.get(); }
 	ResourceModule* GetResourceModule() const { return m_ResourceModule.get(); }
 	ShaderDescriptorModule* GetShaderDescriptors() const { return m_ShaderDescriptorModule.get(); }
+	MeshLibrary* GetMeshLibrary() const { return m_MeshLibrary.get(); }
 
 private:
-	std::unique_ptr<Mesh> m_TestMesh;
+	std::unique_ptr<MeshLibrary> m_MeshLibrary;
 };

@@ -10,6 +10,8 @@ class ShaderDescriptorModule;
 class Scene;
 class WindowLogger;
 class WindowHierarchy;
+class WindowInspector;
+class MeshLibrary;
 
 class EditorUI
 {
@@ -23,7 +25,7 @@ public:
 	void Shutdown();
 
 public:
-	void Draw(Scene* activeScene);
+	void Draw(Scene* activeScene, MeshLibrary* meshLibrary);
 
 private:
 	void SetupStyle();
@@ -32,4 +34,5 @@ private:
 private:
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
 	std::unique_ptr<WindowHierarchy>	m_WindowHierarchy;
+	std::unique_ptr<WindowInspector>	m_WindowInspector;
 };

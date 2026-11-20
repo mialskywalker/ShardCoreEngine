@@ -9,6 +9,6 @@ enum class ComponentType
 	Camera,
 	Script,
 
-	Test,
+	None,
 	Count
 };

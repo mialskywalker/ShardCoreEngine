@@ -6,6 +6,9 @@
 
 #include "WindowLogger.h"
 #include "WindowHierarchy.h"
+#include "WindowInspector.h"
+
+#include "MeshLibrary.h"
 
 EditorUI::EditorUI() {}
 
@@ -83,6 +86,7 @@ bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descr
 	// init members
 	m_WindowLogger = std::make_unique<WindowLogger>();
 	m_WindowHierarchy = std::make_unique<WindowHierarchy>();
+	m_WindowInspector = std::make_unique<WindowInspector>();
 
 	return true;
 }
@@ -112,10 +116,11 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw(Scene* activeScene)
+void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary)
 {
 	m_WindowLogger->Draw();
 	m_WindowHierarchy->Draw(activeScene);
+	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID(), meshLibrary);
 }
 
 void EditorUI::SetupStyle()

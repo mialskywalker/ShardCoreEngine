@@ -4,14 +4,18 @@
 #include "D3D12Module.h"
 #include "ResourceModule.h"
 #include "ShaderDescriptorModule.h"
+
 #include "Camera.h"
 #include "Scene.h"
-#include <SimpleMath.h>
-#include "TransformComponent.h"
 #include "Mesh.h"
 #include "MeshPrimitives.h"
-#include "MeshComponent.h"
 #include "GameObject.h"
+#include "MeshLibrary.h"
+
+#include "TransformComponent.h"
+#include "MeshComponent.h"
+
+#include <SimpleMath.h>
 
 Renderer::Renderer() {}
 
@@ -32,6 +36,10 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	// ShaderDescriptorModule init
 	m_ShaderDescriptorModule = std::make_unique<ShaderDescriptorModule>();
 	ok = ok && m_ShaderDescriptorModule->Init(*m_D3D12Module);
+
+	// MeshLibrary init
+	m_MeshLibrary = std::make_unique<MeshLibrary>();
+	ok = ok && m_MeshLibrary->Init(*m_ResourceModule);
 
 	return ok;
 }

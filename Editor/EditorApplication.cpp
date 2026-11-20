@@ -1,6 +1,7 @@
 #include "EditorApplication.h"
 #include "D3D12Module.h"
 #include "ShaderDescriptorModule.h"
+#include "MeshLibrary.h"
 #include "imgui_impl_win32.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
@@ -48,7 +49,7 @@ void EditorApplication::OnBeginFrame()
 void EditorApplication::OnRenderOverlay()
 {
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
-	m_EditorUI.Draw(GetActiveScene());
+	m_EditorUI.Draw(GetActiveScene(), GetRenderer().GetMeshLibrary());
 	m_EditorUI.Render(GetRenderer().GetD3D12()->GetCommandList(), *GetRenderer().GetShaderDescriptors()); // Render ImGui
 }
 

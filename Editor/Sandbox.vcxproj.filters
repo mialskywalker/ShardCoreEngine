@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -25,11 +17,14 @@
     <Filter Include="External\ImGui\Backends">
       <UniqueIdentifier>{d92966b3-4662-4d74-8501-9d1f89262db1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{de1295cb-9168-4d5c-a38f-438c14eb6b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{fed35a88-3ba8-4212-9d2d-af74649eb4bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\External\imgui\imgui.cpp">
       <Filter>External\ImGui\Core</Filter>
     </ClCompile>
@@ -51,23 +46,26 @@
     <ClCompile Include="..\External\imgui\backends\imgui_impl_win32.cpp">
       <Filter>External\ImGui\Backends</Filter>
     </ClCompile>
-    <ClCompile Include="EditorUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorApplication.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="WindowHierarchy.cpp">
+      <Filter>Windows</Filter>
     </ClCompile>
     <ClCompile Include="WindowLogger.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Windows</Filter>
     </ClCompile>
-    <ClCompile Include="WindowHierarchy.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="EditorApplication.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorUI.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowInspector.cpp">
+      <Filter>Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\External\imgui\imconfig.h">
       <Filter>External\ImGui\Core</Filter>
     </ClInclude>
@@ -92,17 +90,23 @@
     <ClInclude Include="..\External\imgui\backends\imgui_impl_win32.h">
       <Filter>External\ImGui\Backends</Filter>
     </ClInclude>
-    <ClInclude Include="EditorUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorApplication.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WindowLogger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Windows</Filter>
     </ClInclude>
     <ClInclude Include="WindowHierarchy.h">
-      <Filter>Header Files</Filter>
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorUI.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorApplication.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowInspector.h">
+      <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

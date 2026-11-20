@@ -150,6 +150,31 @@ Component* GameObject::GetComponent(ComponentType type) const
 	return nullptr;
 }
 
+bool GameObject::RemoveComponent(ComponentType type)
+{
+	if (type == ComponentType::Transform)
+	{
+		return false;
+	}
+
+	auto it = std::find_if(
+		m_Components.begin(),
+		m_Components.end(),
+		[type](const std::unique_ptr<Component>& comp)
+		{
+			return comp->GetType() == type;
+		}
+	);
+
+	if (it == m_Components.end())
+	{
+		return false;
+	}
+	
+	m_Components.erase(it);
+	return true;
+}
+
 TransformComponent* GameObject::GetTransform() const
 {
 	return static_cast<TransformComponent*>(GetComponent(ComponentType::Transform));

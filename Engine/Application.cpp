@@ -5,7 +5,6 @@
 #include "D3D12Module.h"
 #include "SceneModule.h"
 #include "Scene.h"
-#include "GameObject.h"
 
 Application::Application() {}
 
@@ -18,7 +17,9 @@ bool Application::Init()
 	ok = ok && m_Camera.Init(m_Window.GetWidth(), m_Window.GetHeight());
 	ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
+	// Create Scene
 	m_SceneModule = std::make_unique<SceneModule>();
+
 	Scene* scene = m_SceneModule->CreateScene("Default Scene");
 
 	if (!scene || !scene->Init())
