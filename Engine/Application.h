@@ -6,6 +6,9 @@
 #include "Camera.h"
 #include <memory>
 
+class SceneModule;
+class Scene;
+
 class Application
 {
 public:
@@ -23,6 +26,7 @@ protected:
 public:
 	Window& GetWindow() { return m_Window; }
 	Renderer& GetRenderer() { return m_Renderer; }
+	Scene* GetActiveScene() const;
 	
 private:
 	void Update();
@@ -34,6 +38,8 @@ private:
 	Timer			m_Timer;
 	Renderer		m_Renderer;
 	Camera			m_Camera;
+
+	std::unique_ptr<SceneModule> m_SceneModule;
 
 	float fov = 0.78f;
 };

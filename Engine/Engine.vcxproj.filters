@@ -25,6 +25,9 @@
     <Filter Include="Scene\Components">
       <UniqueIdentifier>{e7d6933e-5b7a-4b78-9c26-f6f739b695db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{4d08b435-4ea1-4481-a553-37eb447c7471}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -42,20 +45,11 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceModule.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D12Module.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Platform</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderDescriptorModule.cpp">
-      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Scene</Filter>
@@ -71,6 +65,30 @@
     </ClCompile>
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneModule.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D12Module.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceModule.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderDescriptorModule.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshPrimitives.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshLibrary.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,12 +109,6 @@
     <ClInclude Include="Logger.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceModule.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D12Module.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="ReadData.h" />
     <ClInclude Include="Camera.h">
       <Filter>Scene</Filter>
@@ -106,9 +118,6 @@
     </ClInclude>
     <ClInclude Include="InputCodes.h">
       <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderDescriptorModule.h">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Scene</Filter>
@@ -127,6 +136,36 @@
     </ClInclude>
     <ClInclude Include="ComponentFactory.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneModule.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D12Module.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceModule.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderDescriptorModule.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshData.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshPrimitives.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshLibrary.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

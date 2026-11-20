@@ -1,10 +1,6 @@
 #include "WindowLogger.h"
 #include "Logger.h"
 
-WindowLogger::WindowLogger() {}
-
-WindowLogger::~WindowLogger() {}
-
 void WindowLogger::Draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);

@@ -43,7 +43,7 @@ ComPtr<ID3D12Resource> ResourceModule::CreateUploadBuffer(size_t bufferSize, voi
 
 }
 
-ComPtr<ID3D12Resource> ResourceModule::CreateDefaultBuffer(size_t bufferSize, void* data)
+ComPtr<ID3D12Resource> ResourceModule::CreateDefaultBuffer(size_t bufferSize, const void* data, D3D12_RESOURCE_STATES finalState)
 {
 	// Staging Buffer
 	ComPtr<ID3D12Resource> stagingBuffer;
@@ -74,7 +74,7 @@ ComPtr<ID3D12Resource> ResourceModule::CreateDefaultBuffer(size_t bufferSize, vo
 	m_D3D12->GetCommandList()->CopyResource(vertexBuffer.Get(), stagingBuffer.Get());
 	
 	// Transition
-	barrier = CD3DX12_RESOURCE_BARRIER::Transition(vertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(vertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, finalState);
 	m_D3D12->GetCommandList()->ResourceBarrier(1, &barrier);
 	m_D3D12->GetCommandList()->Close();
 	

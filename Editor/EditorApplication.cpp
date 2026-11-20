@@ -48,8 +48,7 @@ void EditorApplication::OnBeginFrame()
 void EditorApplication::OnRenderOverlay()
 {
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
-	ImGui::ShowDemoWindow(); // Demo Window
-	m_EditorUI.Draw();
+	m_EditorUI.Draw(GetActiveScene());
 	m_EditorUI.Render(GetRenderer().GetD3D12()->GetCommandList(), *GetRenderer().GetShaderDescriptors()); // Render ImGui
 }
 

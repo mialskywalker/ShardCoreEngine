@@ -20,6 +20,7 @@ public:
 	GameObject* CreateGameObject(const std::string& name);
 	GameObject* GetGameObject(uint64_t uid);
 	bool RemoveGameObject(uint64_t uid);
+	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return m_GameObjects; }
 
 private:
 	std::string m_Name;
@@ -27,4 +28,5 @@ private:
 	std::vector<std::unique_ptr<GameObject>> m_GameObjects;
 	bool m_IsUpdating = false;
 	std::vector<uint64_t> m_PendingRemovals;
+	std::vector<std::unique_ptr<GameObject>> m_PendingAdditions;
 };

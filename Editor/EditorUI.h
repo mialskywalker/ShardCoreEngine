@@ -7,7 +7,9 @@
 
 class D3D12Module;
 class ShaderDescriptorModule;
+class Scene;
 class WindowLogger;
+class WindowHierarchy;
 
 class EditorUI
 {
@@ -21,7 +23,7 @@ public:
 	void Shutdown();
 
 public:
-	void Draw();
+	void Draw(Scene* activeScene);
 
 private:
 	void SetupStyle();
@@ -29,4 +31,5 @@ private:
 
 private:
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
+	std::unique_ptr<WindowHierarchy>	m_WindowHierarchy;
 };

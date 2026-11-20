@@ -3,7 +3,9 @@
 #include "ShaderDescriptorModule.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+
 #include "WindowLogger.h"
+#include "WindowHierarchy.h"
 
 EditorUI::EditorUI() {}
 
@@ -80,6 +82,7 @@ bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descr
 
 	// init members
 	m_WindowLogger = std::make_unique<WindowLogger>();
+	m_WindowHierarchy = std::make_unique<WindowHierarchy>();
 
 	return true;
 }
@@ -109,9 +112,10 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw()
+void EditorUI::Draw(Scene* activeScene)
 {
 	m_WindowLogger->Draw();
+	m_WindowHierarchy->Draw(activeScene);
 }
 
 void EditorUI::SetupStyle()

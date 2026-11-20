@@ -15,6 +15,8 @@ class D3D12Module;
 class ResourceModule;
 class ShaderDescriptorModule;
 class Camera;
+class Mesh;
+class Scene;
 
 class Renderer
 {
@@ -25,7 +27,7 @@ public:
 	bool Init(HWND hwnd, uint32_t width, uint32_t height);
 
 	void PreRender();
-	void Render(Camera& camera);
+	void Render(Camera& camera, Scene* scene);
 	void PostRender();
 
 private:
@@ -40,6 +42,5 @@ public:
 	ShaderDescriptorModule* GetShaderDescriptors() const { return m_ShaderDescriptorModule.get(); }
 
 private:
-	ComPtr<ID3D12Resource>						m_vertexBuffer;
-	D3D12_VERTEX_BUFFER_VIEW					vbv;
+	std::unique_ptr<Mesh> m_TestMesh;
 };

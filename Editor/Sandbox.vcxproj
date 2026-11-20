@@ -122,9 +122,10 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets\*" "$(TargetDir)Assets\" /E /I /Y</Command>
@@ -141,9 +142,10 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets\*" "$(TargetDir)Assets\" /E /I /Y</Command>
@@ -160,6 +162,7 @@
     <ClCompile Include="EditorApplication.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="WindowHierarchy.cpp" />
     <ClCompile Include="WindowLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +182,7 @@
     <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="EditorUI.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="WindowHierarchy.h" />
     <ClInclude Include="WindowLogger.h" />
   </ItemGroup>
   <ItemGroup>

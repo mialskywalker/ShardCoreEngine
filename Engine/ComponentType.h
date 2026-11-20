@@ -3,6 +3,7 @@
 enum class ComponentType
 {
 	Transform,
+	Mesh,
 	Model,
 	Sprite,
 	Camera,

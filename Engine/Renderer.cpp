@@ -5,7 +5,13 @@
 #include "ResourceModule.h"
 #include "ShaderDescriptorModule.h"
 #include "Camera.h"
+#include "Scene.h"
 #include <SimpleMath.h>
+#include "TransformComponent.h"
+#include "Mesh.h"
+#include "MeshPrimitives.h"
+#include "MeshComponent.h"
+#include "GameObject.h"
 
 Renderer::Renderer() {}
 
@@ -27,24 +33,6 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	m_ShaderDescriptorModule = std::make_unique<ShaderDescriptorModule>();
 	ok = ok && m_ShaderDescriptorModule->Init(*m_D3D12Module);
 
-	struct Vertex
-	{
-		float position[3];
-		float color[3];
-	};
-
-	Vertex vertices[3] =
-	{ 
-		{{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-		{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-		{{0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}} 
-	};
-
-	m_vertexBuffer = m_ResourceModule->CreateDefaultBuffer(sizeof(vertices), vertices);
-	vbv.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
-	vbv.StrideInBytes = sizeof(Vertex);
-	vbv.SizeInBytes = sizeof(vertices);
-
 	return ok;
 }
 
@@ -56,12 +44,8 @@ void Renderer::PreRender()
 	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
 }
 
-void Renderer::Render(Camera& camera)
+void Renderer::Render(Camera& camera, Scene* scene)
 {
-	const Matrix model = Matrix::Identity;
-	DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
-	// MVP TEST
-
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = m_D3D12Module->GetCurrentRTVHandle();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_D3D12Module->GetDSVHandle();
@@ -76,11 +60,44 @@ void Renderer::Render(Camera& camera)
 	m_D3D12Module->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	m_D3D12Module->GetCommandList()->SetGraphicsRootSignature(m_D3D12Module->GetRootSignature());
 	m_D3D12Module->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
+	
+	if (scene)
+	{
+		for (const auto& go : scene->GetGameObjects())
+		{
+			if (!go->IsActive())
+			{
+				continue;
+			}
 
-	// triangle
-	m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0); // temp
-	m_D3D12Module->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+			// Find MeshComponent
+			Component* comp = go->GetComponent(ComponentType::Mesh);
+			if (!comp || !comp->IsEnabled())
+			{
+				continue;
+			}
+
+			// Get Mesh
+			Mesh* m = static_cast<MeshComponent*>(comp)->GetMesh();
+			if (!m)
+			{
+				continue;
+			}
+			
+			Matrix model = go->GetTransform()->GetWorldMatrix();
+			DirectX::SimpleMath::Matrix mvp = (model * camera.GetView() * camera.GetProjection()).Transpose();
+
+			const auto& vbv = m->GetVertexBufferView();
+			const auto& ibv = m->GetIndexBufferView();
+			
+			m_D3D12Module->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
+			m_D3D12Module->GetCommandList()->IASetIndexBuffer(&ibv);
+
+			m_D3D12Module->GetCommandList()->SetGraphicsRoot32BitConstants(0, sizeof(DirectX::XMMATRIX) / sizeof(UINT32), &mvp, 0);
+
+			m_D3D12Module->GetCommandList()->DrawIndexedInstanced(m->GetIndexCount(), 1, 0, 0, 0);
+		}
+	}
 }
 
 void Renderer::PostRender()

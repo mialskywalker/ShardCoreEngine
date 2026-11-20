@@ -28,6 +28,14 @@ void Scene::Update(float deltaTime)
 
 	m_IsUpdating = false;
 
+	// Process pending additions
+	for (auto& go : m_PendingAdditions)
+	{
+		m_GameObjects.push_back(std::move(go));
+	}
+
+	m_PendingAdditions.clear();
+
 	// Process pending removals
 	std::vector<uint64_t> pending;
 	pending.swap(m_PendingRemovals);
@@ -41,14 +49,23 @@ void Scene::Update(float deltaTime)
 GameObject* Scene::CreateGameObject(const std::string& name)
 {
 	std::unique_ptr<GameObject> newGameObject = std::make_unique<GameObject>(this, m_NextUID++, name);
-	GameObject* rawPtr = newGameObject.get();
 
 	if (!newGameObject->Init())
 	{
 		return nullptr;
 	}
 
-	m_GameObjects.push_back(std::move(newGameObject));
+	GameObject* rawPtr = newGameObject.get();
+
+	if (m_IsUpdating)
+	{
+		m_PendingAdditions.push_back(std::move(newGameObject));
+	}
+	else
+	{
+		m_GameObjects.push_back(std::move(newGameObject));
+	}
+
 
 	return rawPtr;
 }

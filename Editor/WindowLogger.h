@@ -5,9 +5,6 @@
 class WindowLogger
 {
 public:
-	WindowLogger();
-	~WindowLogger();
-
 	void Draw();
 
 private:
