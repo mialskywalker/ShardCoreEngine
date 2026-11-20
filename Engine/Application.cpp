@@ -14,13 +14,12 @@ bool Application::Init()
 {
 	bool ok = m_Window.Init();
 	ok = ok && Input::Initialize(m_Window.GetHandle());
-	ok = ok && m_Camera.Init(m_Window.GetWidth(), m_Window.GetHeight());
 	ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
 	// Create Scene
 	m_SceneModule = std::make_unique<SceneModule>();
 
-	Scene* scene = m_SceneModule->CreateScene("Default Scene");
+	Scene* scene = m_SceneModule->CreateScene("NewScene");
 
 	if (!scene || !scene->Init())
 	{
@@ -54,21 +53,20 @@ void Application::Run()
 
 void Application::Update()
 {
-	if (CanUpdateCamera())
-	{
-		m_Camera.Update(m_Timer.GetDeltaTime());
-	}
+	float deltaTime = m_Timer.GetDeltaTime();
+
+	OnUpdate(deltaTime);
 
 	if (m_SceneModule)
 	{
-		m_SceneModule->Update(m_Timer.GetDeltaTime());
+		m_SceneModule->Update(deltaTime);
 	}
 }
 
 void Application::Render()
 {
 	m_Renderer.PreRender();	
-	m_Renderer.Render(m_Camera, GetActiveScene());
+	m_Renderer.Render(GetRenderCamera(), GetActiveScene());
 
 	OnRenderOverlay();
 

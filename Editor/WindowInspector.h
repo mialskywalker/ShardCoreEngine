@@ -2,12 +2,15 @@
 
 #include "ComponentType.h"
 #include <cstdint>
+#include <SimpleMath.h>
 
 class Scene;
 class GameObject;
 class TransformComponent;
 class MeshComponent;
 class MeshLibrary;
+
+using DirectX::SimpleMath::Quaternion;
 
 class WindowInspector
 {
@@ -26,4 +29,8 @@ private:
     uint64_t m_LastSelectedUID = 0;
     Scene* m_LastScene = nullptr;
     ComponentType m_PendingRemoveComponent = ComponentType::None;
+
+    Quaternion m_LastRotation = Quaternion::Identity;
+    bool m_RotationInitialized = false;
+    bool m_EditingRotation = false;
 };

@@ -94,6 +94,107 @@ bool RenderTexture::Init(D3D12Module& d3d12, ShaderDescriptorModule& descriptors
     return true;
 }
 
+bool RenderTexture::Resize(uint32_t width, uint32_t height)
+{
+    if (width == 0 || height == 0)
+    {
+        return false;
+    }
+
+    if (width == m_Width && height == m_Height)
+    {
+        return false;
+    }
+
+    if (!m_D3D12 || !m_Descriptors || m_DescriptorIndex < 0)
+    {
+        return false;
+    }
+
+    // Ensure GPU has finished using old resources
+    m_D3D12->WaitForGPU();
+
+    auto* device = m_D3D12->GetDevice();
+
+    CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
+
+    // Color Buffer
+
+    auto colorDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+        DXGI_FORMAT_R8G8B8A8_UNORM,
+        width,
+        height,
+        1,
+        1,
+        1,
+        0,
+        D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
+    );
+
+    D3D12_CLEAR_VALUE colorClear = {};
+    colorClear.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    colorClear.Color[0] = 0.1f;
+    colorClear.Color[1] = 0.1f;
+    colorClear.Color[2] = 0.1f;
+    colorClear.Color[3] = 1.0f;
+
+    ComPtr<ID3D12Resource> newColorBuffer;
+
+    if (FAILED(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &colorDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &colorClear, IID_PPV_ARGS(&newColorBuffer))))
+    {
+        return false;
+    }
+
+    // Depth Buffer
+
+    auto depthDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+        DXGI_FORMAT_D32_FLOAT,
+        width,
+        height,
+        1,
+        1,
+        1,
+        0,
+        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
+    );
+
+    D3D12_CLEAR_VALUE depthClear = {};
+    depthClear.Format = DXGI_FORMAT_D32_FLOAT;
+    depthClear.DepthStencil.Depth = 1.0f;
+
+    ComPtr<ID3D12Resource> newDepthBuffer;
+
+    if (FAILED(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &depthDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClear, IID_PPV_ARGS(&newDepthBuffer))))
+    {
+        return false;
+    }
+
+    // Replace Resources
+
+    m_Texture = std::move(newColorBuffer);
+    m_DepthBuffer = std::move(newDepthBuffer);
+
+    // Reuse existing RTV descriptor
+    device->CreateRenderTargetView(m_Texture.Get(), nullptr, m_RTVHandle);
+
+    // Reuse existing DSV descriptor
+    device->CreateDepthStencilView(m_DepthBuffer.Get(), nullptr, m_DSVHandle);
+
+    // Reuse existing SRV descriptor
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    device->CreateShaderResourceView(m_Texture.Get(), &srvDesc, m_Descriptors->GetCPUHandle(m_DescriptorIndex));
+
+    m_Width = width;
+    m_Height = height;
+
+    return true;
+}
+
 bool RenderTexture::CreateDepthBuffer(uint32_t width, uint32_t height)
 {
     auto* device = m_D3D12->GetDevice();

@@ -13,7 +13,7 @@ public:
     ~RenderTexture();
 
     bool Init(D3D12Module& d3d12, ShaderDescriptorModule& descriptors, uint32_t width, uint32_t height);
-    void Resize(uint32_t width, uint32_t height);
+    bool Resize(uint32_t width, uint32_t height);
 
     ID3D12Resource* GetResource() const;
 

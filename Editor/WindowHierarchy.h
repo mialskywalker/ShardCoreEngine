@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 class Scene;
 class GameObject;
@@ -20,4 +21,5 @@ private:
 	Scene* m_LastScene = nullptr;
 	uint64_t m_PendingCreateChildUID = 0;
 	uint64_t m_PendingDeleteUID = 0;
+	std::string m_SceneName;
 };

@@ -5,6 +5,8 @@
 #include "d3dx12.h"
 #include "imgui.h"
 #include "WindowViewport.h"
+#include "EditorSettings.h"
+#include "EditorGizmo.h"
 
 class D3D12Module;
 class ShaderDescriptorModule;
@@ -13,6 +15,7 @@ class WindowLogger;
 class WindowHierarchy;
 class WindowInspector;
 class MeshLibrary;
+class Camera;
 
 class EditorUI
 {
@@ -26,7 +29,12 @@ public:
 	void Shutdown();
 
 public:
-	void Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture);
+	void Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture, Camera& camera);
+
+	bool IsSceneHovered() const { return m_WindowViewport.IsHovered(); }
+	uint32_t GetViewportWidth() const { return m_WindowViewport.GetWidth(); }
+	uint32_t GetViewportHeight() const { return m_WindowViewport.GetHeight(); }
+	const EditorSettings& GetSettings() const { return m_Settings; }
 
 private:
 	void SetupStyle();
@@ -37,4 +45,6 @@ private:
 	std::unique_ptr<WindowHierarchy>	m_WindowHierarchy;
 	std::unique_ptr<WindowInspector>	m_WindowInspector;
 	WindowViewport						m_WindowViewport;
+	EditorSettings						m_Settings;
+	EditorGizmo							m_EditorGizmo;
 };

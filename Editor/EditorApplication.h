@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "EditorUI.h"
+#include "EditorCamera.h"
 
 class EditorApplication : public Application
 {
@@ -12,8 +13,10 @@ public:
 protected:
     void OnBeginFrame() override;
     void OnRenderOverlay() override;
-    bool CanUpdateCamera() const override;
+    void OnUpdate(float deltaTime) override;
+    Camera& GetRenderCamera() override;
 
 private:
     EditorUI m_EditorUI;
+    EditorCamera m_EditorCamera;
 };

@@ -21,7 +21,9 @@ public:
 protected:
 	virtual void OnBeginFrame() {}
 	virtual void OnRenderOverlay() {}
-	virtual bool CanUpdateCamera() const { return true; }
+
+	virtual void OnUpdate(float deltaTime) {}
+	virtual Camera& GetRenderCamera() { return m_Camera; }
 
 public:
 	Window& GetWindow() { return m_Window; }

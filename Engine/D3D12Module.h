@@ -49,6 +49,7 @@ private:
 
 	ComPtr<ID3D12RootSignature>					m_RootSignature;
 	ComPtr<ID3D12PipelineState>					m_PipelineStateObject;
+	ComPtr<ID3D12PipelineState>					m_DebugPipelineStateObject;
 
 	ComPtr<ID3D12Resource>						m_DepthStencilBuffer;
 	ComPtr<ID3D12DescriptorHeap>				m_DSVDescriptorHeap;
@@ -99,6 +100,7 @@ public:
 
 	ID3D12RootSignature*			GetRootSignature() const { return m_RootSignature.Get(); }
 	ID3D12PipelineState*			GetPipelineStateObject() const { return m_PipelineStateObject.Get(); }
+	ID3D12PipelineState*			GetDebugPipelineStateObject() const { return m_DebugPipelineStateObject.Get(); }
 
 	void							WaitForGPU();
 	void							Resize();

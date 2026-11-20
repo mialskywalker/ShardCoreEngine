@@ -11,6 +11,7 @@ void WindowHierarchy::Draw(Scene* scene)
     {
         m_SelectedUID = 0;
         m_LastScene = scene;
+        m_SceneName = scene->GetSceneName();
     }
 
     if (scene && m_SelectedUID != 0)
@@ -23,6 +24,8 @@ void WindowHierarchy::Draw(Scene* scene)
 
 	if (scene)
 	{
+        ImGui::Text(m_SceneName.c_str());
+
 		for (auto& go : scene->GetGameObjects())
 		{
 			if (go->GetParent() == nullptr)

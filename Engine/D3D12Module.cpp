@@ -58,7 +58,6 @@ void D3D12Module::EnableDebugLayer()
 {
 	D3D12GetDebugInterface(IID_PPV_ARGS(&m_DebugInterface));
 	m_DebugInterface->EnableDebugLayer();
-	Logger::Log("Debug Layer enabled", LogType::Engine);
 }
 
 void D3D12Module::EnableInfoQueue()
@@ -85,11 +84,6 @@ bool D3D12Module::CreateDevice()
 	// Create a device
 	bool ok = SUCCEEDED(D3D12CreateDevice(m_Adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_Device)));
 
-	if (ok)
-		Logger::Log("Device created", LogType::Engine);
-	else
-		Logger::Error("Device creation failed", LogType::Engine);
-
 	return ok;
 }
 
@@ -101,11 +95,6 @@ bool D3D12Module::CreateCommandQueue()
 	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
 	bool ok = SUCCEEDED(m_Device->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_CommandQueue)));
-
-	if (ok)
-		Logger::Log("Command Queue created", LogType::Engine);
-	else
-		Logger::Error("Command Queue creation failed", LogType::Engine);
 
 	return ok;
 }
@@ -134,11 +123,6 @@ bool D3D12Module::CreateSwapChain()
 
 	ok = ok && SUCCEEDED(swapChain.As(&m_SwapChain));
 
-	if (ok)
-		Logger::Log("Swap Chain created", LogType::Engine);
-	else
-		Logger::Error("Swap Chain creation failed", LogType::Engine);
-
 	return ok;
 }
 
@@ -152,11 +136,6 @@ bool D3D12Module::CreateDescriptorHeaps()
 
 	bool ok = SUCCEEDED(m_Device->CreateDescriptorHeap(&descRTV, IID_PPV_ARGS(&m_RTVDescriptorHeap)));
 
-	if (ok)
-		Logger::Log("RTV Descriptor Heap created", LogType::Engine);
-	else
-		Logger::Error("RTV Descriptor Heap creation failed", LogType::Engine);
-
 	// DSV
 	D3D12_DESCRIPTOR_HEAP_DESC descDSV = {};
 	descDSV.NumDescriptors = 1;
@@ -164,11 +143,6 @@ bool D3D12Module::CreateDescriptorHeaps()
 	descDSV.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
 	ok = ok && SUCCEEDED(m_Device->CreateDescriptorHeap(&descDSV, IID_PPV_ARGS(&m_DSVDescriptorHeap)));
-
-	if (ok)
-		Logger::Log("DSV Descriptor Heap created", LogType::Engine);
-	else
-		Logger::Error("DSV Descriptor Heap creation failed", LogType::Engine);
 
 	return ok;
 }
@@ -185,7 +159,6 @@ bool D3D12Module::CreateRenderTargetViews()
 		ok = ok && SUCCEEDED(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_BackBuffers[i])));
 		if (!ok)
 		{
-			Logger::Log("RTVs Creation failed", LogType::Engine);
 			return ok;
 		}
 
@@ -193,7 +166,6 @@ bool D3D12Module::CreateRenderTargetViews()
 		RTVHandle.Offset(m_RTVDescriptorSize);
 	}
 
-	Logger::Log("RTVs created", LogType::Engine);
 	return ok;
 }
 
@@ -210,11 +182,6 @@ bool D3D12Module::CreateDepthStencilView()
 	bool ok = SUCCEEDED(m_Device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearValue, IID_PPV_ARGS(&m_DepthStencilBuffer)));
 	m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, GetDSVHandle());
 
-	if (ok)
-		Logger::Log("DSV created", LogType::Engine);
-	else
-		Logger::Error("DSV creation failed", LogType::Engine);
-
 	return ok;
 }
 
@@ -227,23 +194,16 @@ bool D3D12Module::CreateCommandAllocators()
 		ok = ok && SUCCEEDED(m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocators[i])));
 		if (!ok)
 		{
-			Logger::Error("Command Allocators creation failed", LogType::Engine);
 			return ok;
 		}
 	}
 
-	Logger::Log("Command Allocators created", LogType::Engine);
 	return ok;
 }
 
 bool D3D12Module::CreateCommandList()
 {
 	bool ok = SUCCEEDED(m_Device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_CommandList)));
-
-	if (ok)
-		Logger::Log("Command List created", LogType::Engine);
-	else
-		Logger::Error("Command List creation failed", LogType::Engine);
 
 	return ok;
 }
@@ -261,8 +221,6 @@ bool D3D12Module::CreateFence()
 	// windows event handle
 	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-	Logger::Log("Fence + Event Created!", LogType::Engine);
-
 	return m_FenceEvent != nullptr;
 }
 
@@ -279,11 +237,6 @@ bool D3D12Module::CreateRootSignature()
 	ComPtr<ID3DBlob> blob;
 	ok = SUCCEEDED(D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr));
 	ok = ok && SUCCEEDED(m_Device->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
-
-	if (ok)
-		Logger::Log("Root Signature created", LogType::Engine);
-	else
-		Logger::Error("Root Signature creation failed", LogType::Engine);
 
 	return ok;
 }
@@ -317,10 +270,16 @@ bool D3D12Module::CreatePipelineStateObject()
 
 	ok = SUCCEEDED(m_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_PipelineStateObject)));
 
-	if (ok)
-		Logger::Log("Pipeline State Object created", LogType::Engine);
-	else
-		Logger::Error("Pipeline State Object creation failed", LogType::Engine);
+	if (!ok)
+	{
+		return false;
+	}
+
+	// Debug Draw Pipeline
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+
+	ok = ok && SUCCEEDED(m_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_DebugPipelineStateObject)));
 
 	return ok;
 }

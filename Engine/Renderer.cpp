@@ -7,6 +7,7 @@
 #include "RenderTexture.h"
 
 #include "Camera.h"
+#include "DebugDraw.h"
 #include "Scene.h"
 #include "Mesh.h"
 #include "MeshPrimitives.h"
@@ -20,7 +21,10 @@
 
 Renderer::Renderer() {}
 
-Renderer::~Renderer() {}
+Renderer::~Renderer() 
+{
+	m_DebugDraw->Shutdown();
+}
 
 bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 {
@@ -42,6 +46,10 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	m_SceneRenderTexture = std::make_unique<RenderTexture>();
 	ok = ok && m_SceneRenderTexture->Init(*m_D3D12Module, *m_ShaderDescriptorModule, m_D3D12Module->GetWidth(), m_D3D12Module->GetHeight());
 
+	// DebugDraw init
+	m_DebugDraw = std::make_unique<DebugDraw>();
+	ok = ok && m_DebugDraw->Init(*m_D3D12Module);
+
 	// MeshLibrary init
 	m_MeshLibrary = std::make_unique<MeshLibrary>();
 	ok = ok && m_MeshLibrary->Init(*m_ResourceModule);
@@ -51,9 +59,23 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 
 void Renderer::PreRender()
 {
+	if (m_RequestedSceneWidth > 0 && m_RequestedSceneHeight > 0)
+	{
+		if (m_SceneRenderTexture->GetWidth() != m_RequestedSceneWidth || m_SceneRenderTexture->GetHeight() != m_RequestedSceneHeight)
+		{
+			if (!m_SceneRenderTexture->Resize(m_RequestedSceneWidth, m_RequestedSceneHeight))
+			{
+				Logger::Error("Scene RenderTexture resize failed", LogType::Engine);
+			}
+		}
+
+		m_RequestedSceneWidth = 0;
+		m_RequestedSceneHeight = 0;
+	}
+
 	m_D3D12Module->BeginFrame();
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_D3D12Module->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	m_D3D12Module->GetCommandList()->ResourceBarrier(1, &barrier);
 }
 
@@ -110,8 +132,15 @@ void Renderer::RenderSceneToTexture(Camera& camera, Scene* scene)
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH,	1.0f, 0, 0, nullptr);
 
+	// Update camera aspectRatio
+	float aspectRatio = static_cast<float>(m_SceneRenderTexture->GetWidth()) / static_cast<float>(m_SceneRenderTexture->GetHeight());
+	camera.SetAspectRatio(aspectRatio);
+
 	// Draw GameObjects
 	DrawScene(camera, scene);
+
+	// Debug Draw
+	m_DebugDraw->Render(camera);
 
 	// Render Target -> Shader Resource
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_SceneRenderTexture->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -175,4 +204,15 @@ void Renderer::PrepareBackBuffer()
 
 	commandList->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+}
+
+void Renderer::RequestSceneResize(uint32_t width, uint32_t height)
+{
+	if (width == 0 || height == 0)
+	{
+		return;
+	}
+
+	m_RequestedSceneWidth = width;
+	m_RequestedSceneHeight = height;
 }

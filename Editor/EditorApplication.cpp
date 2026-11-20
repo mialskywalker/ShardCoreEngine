@@ -5,6 +5,8 @@
 #include "RenderTexture.h"
 #include "imgui_impl_win32.h"
 
+#include "DebugDraw.h"
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -17,6 +19,13 @@ bool EditorApplication::Init()
 {
 	// Initialize Application
 	if (!Application::Init())
+	{
+		return false;
+	}
+
+	if (!m_EditorCamera.Init(
+		GetWindow().GetWidth(),
+		GetWindow().GetHeight()))
 	{
 		return false;
 	}
@@ -45,21 +54,29 @@ bool EditorApplication::Init()
 void EditorApplication::OnBeginFrame()
 {
 	m_EditorUI.BeginFrame();
+
+	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
+	m_EditorUI.Draw(GetActiveScene(), GetRenderer().GetMeshLibrary(), GetRenderer().GetSceneRenderTexture(), m_EditorCamera.GetCamera()); // Draw ImGui Windows
+	GetRenderer().RequestSceneResize(m_EditorUI.GetViewportWidth(), m_EditorUI.GetViewportHeight()); // Window resize
 }
 
 void EditorApplication::OnRenderOverlay()
 {
-	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
-	m_EditorUI.Draw(GetActiveScene(), GetRenderer().GetMeshLibrary(), GetRenderer().GetSceneRenderTexture());
 	m_EditorUI.Render(GetRenderer().GetD3D12()->GetCommandList(), *GetRenderer().GetShaderDescriptors()); // Render ImGui
 }
 
-bool EditorApplication::CanUpdateCamera() const
+void EditorApplication::OnUpdate(float deltaTime)
 {
-	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) // Capture clicks and keys on ImGui windows instead of scene
-	{
-		return false;
-	}
+	m_EditorCamera.Update(deltaTime, m_EditorUI.IsSceneHovered());
 
-	return true;
+	// TEMP
+	if (m_EditorUI.GetSettings().ShowGrid)
+	{
+		GetRenderer().GetDebugDraw()->DrawGrid(20, 1.0f, Vector3(0.3f, 0.3f, 0.3f));
+	}
+}
+
+Camera& EditorApplication::GetRenderCamera()
+{
+	return m_EditorCamera.GetCamera();
 }

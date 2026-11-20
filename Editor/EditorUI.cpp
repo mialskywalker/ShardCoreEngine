@@ -3,6 +3,9 @@
 #include "ShaderDescriptorModule.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+#include "ImGuizmo.h"
+#include "Camera.h"
+#include "Scene.h"
 
 #include "WindowLogger.h"
 #include "WindowHierarchy.h"
@@ -96,6 +99,8 @@ void EditorUI::BeginFrame()
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	ImGuizmo::BeginFrame();
 }
 
 void EditorUI::Render(ID3D12GraphicsCommandList* commandList, ShaderDescriptorModule& descriptors)
@@ -116,12 +121,25 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture)
+void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture, Camera& camera)
 {
 	m_WindowLogger->Draw();
 	m_WindowHierarchy->Draw(activeScene);
 	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID(), meshLibrary);
-	m_WindowViewport.Draw(renderTexture);
+
+	ImGui::Begin("Editor Settings");
+	ImGui::Checkbox("Show Grid", &m_Settings.ShowGrid);
+	ImGui::End();
+
+	// ImGuizmo
+	GameObject* selectedObject = nullptr;
+
+	if (activeScene)
+	{
+		selectedObject = activeScene->GetGameObject(m_WindowHierarchy->GetSelectedUID());
+	}
+
+	m_WindowViewport.Draw(renderTexture, m_EditorGizmo, camera,	selectedObject);
 }
 
 void EditorUI::SetupStyle()

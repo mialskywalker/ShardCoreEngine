@@ -9,7 +9,6 @@
 #include "MeshComponent.h"
 
 #include <cstdio>
-#include <SimpleMath.h>
 
 void WindowInspector::Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* meshLibrary)
 {
@@ -27,6 +26,8 @@ void WindowInspector::Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* mesh
                 std::snprintf(m_NameBuffer, sizeof(m_NameBuffer), "%s", go->GetName().c_str());
                 m_LastSelectedUID = selectedUID;
                 m_LastScene = scene;
+                m_RotationInitialized = false;
+                m_EditingRotation = false;
             }
 
             // Name
@@ -158,16 +159,44 @@ void WindowInspector::DrawTransformComponent(TransformComponent* transform)
         DirectX::XMConvertToDegrees(euler.z)
     };
 
+    Quaternion currentRotation = transform->GetRotation();
+
+    bool rotationChanged =
+        std::abs(currentRotation.x - m_LastRotation.x) > 0.00001f ||
+        std::abs(currentRotation.y - m_LastRotation.y) > 0.00001f ||
+        std::abs(currentRotation.z - m_LastRotation.z) > 0.00001f ||
+        std::abs(currentRotation.w - m_LastRotation.w) > 0.00001f;
+
+    // Synchronize external rotation changes
+    if (!m_EditingRotation &&
+        (!m_RotationInitialized || rotationChanged))
+    {
+        Vector3 euler = currentRotation.ToEuler();
+
+        m_RotationDegrees[0] = DirectX::XMConvertToDegrees(euler.x);
+        m_RotationDegrees[1] = DirectX::XMConvertToDegrees(euler.y);
+        m_RotationDegrees[2] = DirectX::XMConvertToDegrees(euler.z);
+
+        m_LastRotation = currentRotation;
+        m_RotationInitialized = true;
+    }
+
     if (ImGui::DragFloat3("Rotation", m_RotationDegrees, 0.5f))
     {
         float pitch = DirectX::XMConvertToRadians(m_RotationDegrees[0]);
         float yaw = DirectX::XMConvertToRadians(m_RotationDegrees[1]);
         float roll = DirectX::XMConvertToRadians(m_RotationDegrees[2]);
 
-        Quaternion rotation = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+        Quaternion rotation =
+            Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 
         transform->SetRotation(rotation);
+
+        m_LastRotation = transform->GetRotation();
     }
+
+    // Must be immediately after DragFloat3
+    m_EditingRotation = ImGui::IsItemActive();
 
     if (ImGui::Button("Reset Transform"))
     {

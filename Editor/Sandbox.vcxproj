@@ -119,7 +119,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +140,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,6 +154,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="..\External\imgui\backends\imgui_impl_dx12.cpp" />
     <ClCompile Include="..\External\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="..\External\imgui\imgui.cpp" />
@@ -160,6 +163,8 @@
     <ClCompile Include="..\External\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="EditorApplication.cpp" />
+    <ClCompile Include="EditorCamera.cpp" />
+    <ClCompile Include="EditorGizmo.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WindowHierarchy.cpp" />
@@ -173,6 +178,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\External\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="..\External\imgui\backends\imgui_impl_dx12.h" />
     <ClInclude Include="..\External\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="..\External\imgui\imconfig.h" />
@@ -182,6 +188,9 @@
     <ClInclude Include="..\External\imgui\imstb_textedit.h" />
     <ClInclude Include="..\External\imgui\imstb_truetype.h" />
     <ClInclude Include="EditorApplication.h" />
+    <ClInclude Include="EditorCamera.h" />
+    <ClInclude Include="EditorGizmo.h" />
+    <ClInclude Include="EditorSettings.h" />
     <ClInclude Include="EditorUI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="WindowHierarchy.h" />
