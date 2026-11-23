@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "FileSystem.h"
 #include <memory>
 
 class SceneModule;
@@ -29,6 +30,7 @@ public:
 	Window& GetWindow() { return m_Window; }
 	Renderer& GetRenderer() { return m_Renderer; }
 	Scene* GetActiveScene() const;
+	FileSystem& GetFileSystem() { return m_FileSystem; }
 	
 private:
 	void Update();
@@ -40,6 +42,7 @@ private:
 	Timer			m_Timer;
 	Renderer		m_Renderer;
 	Camera			m_Camera;
+	FileSystem		m_FileSystem;
 
 	std::unique_ptr<SceneModule> m_SceneModule;
 

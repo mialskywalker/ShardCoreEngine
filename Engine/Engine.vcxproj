@@ -147,6 +147,7 @@
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="D3D12Module.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="D3D12Module.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="DebugDraw.h" />
+    <ClInclude Include="FileSystem.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputCodes.h" />

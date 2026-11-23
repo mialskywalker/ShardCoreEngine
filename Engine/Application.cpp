@@ -12,7 +12,36 @@ Application::~Application() {}
 
 bool Application::Init()
 {
-	bool ok = m_Window.Init();
+	bool ok = true;
+
+	// Initialize FileSystem
+	std::filesystem::path projectRoot =	std::filesystem::current_path() / "SandboxProject";
+
+	if (!m_FileSystem.Init(projectRoot))
+	{
+		Logger::Error("FileSystem initialization failed", LogType::Engine);
+		return false;
+	}
+
+	// Create project directories
+
+	ok = ok && m_FileSystem.CreateDirectories(".");
+	ok = ok && m_FileSystem.CreateDirectories("Assets");
+	ok = ok && m_FileSystem.CreateDirectories("Scenes");
+	ok = ok && m_FileSystem.CreateDirectories("Library");
+	ok = ok && m_FileSystem.CreateDirectories("ProjectSettings");
+
+	if (!ok)
+	{
+		Logger::Error("Failed to create project directories", LogType::Engine);
+		return ok;
+	}
+
+	Logger::Log("FileSystem initialized", LogType::Engine);
+
+	// 
+
+	ok = ok && m_Window.Init();
 	ok = ok && Input::Initialize(m_Window.GetHandle());
 	ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
@@ -25,6 +54,9 @@ bool Application::Init()
 	{
 		return false;
 	}
+
+	std::string root = m_FileSystem.GetProjectRoot().string();
+	Logger::Log(root.c_str(), LogType::Engine);
 
 	return ok;
 }

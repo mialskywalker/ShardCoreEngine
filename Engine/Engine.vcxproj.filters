@@ -28,6 +28,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{4d08b435-4ea1-4481-a553-37eb447c7471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\FileSystem">
+      <UniqueIdentifier>{94421fdf-a290-45e3-adee-1791f9bd1d80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>Core\FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>Core\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
