@@ -37,9 +37,7 @@ bool Application::Init()
 		return ok;
 	}
 
-	Logger::Log("FileSystem initialized", LogType::Engine);
-
-	// 
+	// Systems init
 
 	ok = ok && m_Window.Init();
 	ok = ok && Input::Initialize(m_Window.GetHandle());

@@ -18,6 +18,7 @@ public:
 
 public:
 	GameObject* CreateGameObject(const std::string& name);
+	GameObject* CreateGameObjectWithUID(const std::string& name, uint64_t uid);
 	GameObject* GetGameObject(uint64_t uid);
 	bool RemoveGameObject(uint64_t uid);
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return m_GameObjects; }

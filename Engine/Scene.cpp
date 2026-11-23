@@ -48,15 +48,42 @@ void Scene::Update(float deltaTime)
 
 GameObject* Scene::CreateGameObject(const std::string& name)
 {
-	std::unique_ptr<GameObject> newGameObject = std::make_unique<GameObject>(this, m_NextUID++, name);
+	return CreateGameObjectWithUID(name, m_NextUID++);
+}
 
+GameObject* Scene::CreateGameObjectWithUID(const std::string& name, uint64_t uid)
+{
+	// check if UID is valid
+	if (uid == 0 || uid >= std::numeric_limits<uint64_t>::max())
+	{
+		return nullptr;
+	}
+
+	// check if game object with this uid already exists
+	GameObject* exists = GetGameObject(uid);
+	if (exists)
+	{
+		return nullptr;
+	}
+
+	for (auto& go : m_PendingAdditions)
+	{
+		if (go->GetUID() == uid)
+		{
+			return nullptr;
+		}
+	}
+
+	// create a new game object
+	std::unique_ptr<GameObject> newGameObject = std::make_unique<GameObject>(this, uid, name);
 	if (!newGameObject->Init())
 	{
 		return nullptr;
 	}
 
 	GameObject* rawPtr = newGameObject.get();
-
+	
+	// check if scene is updating
 	if (m_IsUpdating)
 	{
 		m_PendingAdditions.push_back(std::move(newGameObject));
@@ -66,6 +93,7 @@ GameObject* Scene::CreateGameObject(const std::string& name)
 		m_GameObjects.push_back(std::move(newGameObject));
 	}
 
+	m_NextUID = (std::max)(m_NextUID, uid + 1);
 
 	return rawPtr;
 }
