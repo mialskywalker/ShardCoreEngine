@@ -5,6 +5,10 @@
 #include "D3D12Module.h"
 #include "SceneModule.h"
 #include "Scene.h"
+#include "SceneSerializer.h"
+
+#include "GameObject.h"
+#include "TransformComponent.h"
 
 Application::Application() {}
 
@@ -55,6 +59,22 @@ bool Application::Init()
 
 	std::string root = m_FileSystem.GetProjectRoot().string();
 	Logger::Log(root.c_str(), LogType::Engine);
+
+	// test
+	GameObject* go1 = scene->CreateGameObject("first");
+	GameObject* go2 = scene->CreateGameObject("second");
+	GameObject* go3 = scene->CreateGameObject("third");
+
+	go2->SetActive(false);
+	go3->SetParent(go1);
+	go1->GetTransform()->SetPosition(Vector3(2.0f, 1.0f, 0.0f));
+	go1->GetTransform()->SetRotation(Quaternion(0.0f, 0.0f, 0.0f, 1.0f));
+	go1->GetTransform()->SetScale(Vector3(1.0f, 2.0f, 2.0f));
+	// test end
+
+	// scene serializer test
+	SceneSerializer ss(m_FileSystem);
+	ss.SaveScene(*scene, "Scenes/" + scene->GetSceneName() + ".json");
 
 	return ok;
 }

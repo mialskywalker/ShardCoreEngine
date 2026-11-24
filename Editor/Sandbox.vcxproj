@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo;$(SolutionDir)External\nlohmann</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine;$(SolutionDir)External\DirectXTK12\Inc;$(SolutionDir)External\imgui;$(SolutionDir)External\imgui\backends;$(SolutionDir)External\ImGuizmo;$(SolutionDir)External\nlohmann</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
