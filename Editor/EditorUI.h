@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <memory>
+#include <filesystem>
 #include "d3dx12.h"
 #include "imgui.h"
 #include "WindowViewport.h"
@@ -15,10 +16,24 @@ class WindowLogger;
 class WindowHierarchy;
 class WindowInspector;
 class Camera;
+class FileSystem;
+
+enum class EditorAction
+{
+	None,
+	SaveScene,
+	LoadScene
+};
 
 class EditorUI
 {
 public:
+	struct EditorRequest
+	{
+		EditorAction Action = EditorAction::None;
+		std::filesystem::path Path;
+	};
+
 	EditorUI();
 	~EditorUI();
 
@@ -28,16 +43,21 @@ public:
 	void Shutdown();
 
 public:
-	void Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera);
+	void Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera, const FileSystem& fileSystem, const std::filesystem::path& currentScenePath);
 
 	bool IsSceneHovered() const { return m_WindowViewport.IsHovered(); }
 	uint32_t GetViewportWidth() const { return m_WindowViewport.GetWidth(); }
 	uint32_t GetViewportHeight() const { return m_WindowViewport.GetHeight(); }
 	const EditorSettings& GetSettings() const { return m_Settings; }
 
+	EditorRequest ConsumePendingRequest();
+
+	void ClearSelection();
+
 private:
 	void SetupStyle();
 	void SetupFonts();
+	void DrawFileMenu(Scene* activeScene, const FileSystem& fileSystem,	const std::filesystem::path& currentScenePath);
 
 private:
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
@@ -46,4 +66,8 @@ private:
 	WindowViewport						m_WindowViewport;
 	EditorSettings						m_Settings;
 	EditorGizmo							m_EditorGizmo;
+
+	EditorRequest m_PendingRequest;
+	char m_SaveSceneName[128] = {};
+	std::filesystem::path m_SelectedLoadPath;
 };

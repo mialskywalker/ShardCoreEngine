@@ -75,6 +75,11 @@ void WindowHierarchy::Draw(Scene* scene)
 	ImGui::End();
 }
 
+void WindowHierarchy::ClearSelection()
+{
+    m_SelectedUID = 0;
+}
+
 void WindowHierarchy::DrawGameObject(GameObject* go)
 {
     if (!go)

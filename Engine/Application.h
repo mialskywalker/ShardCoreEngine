@@ -31,6 +31,7 @@ public:
 	Renderer& GetRenderer() { return m_Renderer; }
 	Scene* GetActiveScene() const;
 	FileSystem& GetFileSystem() { return m_FileSystem; }
+	SceneModule& GetSceneModule() const { return *m_SceneModule; }
 	
 private:
 	void Update();

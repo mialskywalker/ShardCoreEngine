@@ -13,7 +13,7 @@ public:
 	~SceneSerializer() = default;
 
 	const bool SaveScene(const Scene& scene, const std::filesystem::path& path);
-	const std::unique_ptr<Scene> LoadScene(const std::filesystem::path& path);
+	std::unique_ptr<Scene> LoadScene(const std::filesystem::path& path);
 
 private:
 	const FileSystem& m_FileSystem;

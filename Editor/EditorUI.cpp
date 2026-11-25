@@ -6,6 +6,10 @@
 #include "ImGuizmo.h"
 #include "Camera.h"
 #include "Scene.h"
+#include <utility>
+#include "FileSystem.h"
+#include <cstdio>
+#include <string>
 
 #include "WindowLogger.h"
 #include "WindowHierarchy.h"
@@ -119,8 +123,10 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera)
+void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera, const FileSystem& fileSystem, const std::filesystem::path& currentScenePath)
 {
+    DrawFileMenu(activeScene, fileSystem, currentScenePath);
+
 	m_WindowLogger->Draw();
 	m_WindowHierarchy->Draw(activeScene);
 	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID());
@@ -138,6 +144,22 @@ void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& ca
 	}
 
 	m_WindowViewport.Draw(renderTexture, m_EditorGizmo, camera,	selectedObject);
+}
+
+EditorUI::EditorRequest EditorUI::ConsumePendingRequest()
+{
+	EditorRequest request = std::move(m_PendingRequest);
+	m_PendingRequest = {};
+
+	return request;
+}
+
+void EditorUI::ClearSelection()
+{
+	if (m_WindowHierarchy)
+	{
+		m_WindowHierarchy->ClearSelection();
+	}
 }
 
 void EditorUI::SetupStyle()
@@ -232,4 +254,211 @@ void EditorUI::SetupFonts()
 	);
 
 	ImGui::GetStyle().FontSizeBase = 15.0f;
+}
+
+void EditorUI::DrawFileMenu(
+    Scene* activeScene,
+    const FileSystem& fileSystem,
+    const std::filesystem::path& currentScenePath)
+{
+    bool openSaveAs = false;
+    bool openLoad = false;
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Save Scene", nullptr, false, activeScene != nullptr))
+            {
+                if (currentScenePath.empty())
+                {
+                    openSaveAs = true;
+                }
+                else
+                {
+                    m_PendingRequest = {
+                        EditorAction::SaveScene,
+                        currentScenePath
+                    };
+                }
+            }
+
+            if (ImGui::MenuItem("Save Scene As...", nullptr, false, activeScene != nullptr))
+            {
+                openSaveAs = true;
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Load Scene..."))
+            {
+                openLoad = true;
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+
+    // Open modals after closing the menu
+    if (openSaveAs)
+    {
+        std::snprintf(
+            m_SaveSceneName,
+            sizeof(m_SaveSceneName),
+            "%s",
+            activeScene->GetSceneName().c_str()
+        );
+
+        ImGui::OpenPopup("Save Scene As");
+    }
+
+    if (openLoad)
+    {
+        m_SelectedLoadPath.clear();
+        ImGui::OpenPopup("Load Scene");
+    }
+
+    // SAVE AS WINDOW
+    if (ImGui::BeginPopupModal(
+        "Save Scene As",
+        nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::InputText(
+            "Scene Name",
+            m_SaveSceneName,
+            sizeof(m_SaveSceneName)
+        );
+
+        ImGui::TextDisabled("Saved in: Scenes/");
+
+        std::string name = m_SaveSceneName;
+
+        bool validName =
+            !name.empty() &&
+            name != "." &&
+            name != ".." &&
+            name.find_first_of("<>:\"/\\|?*") == std::string::npos &&
+            name.back() != '.' &&
+            name.back() != ' ';
+
+        if (validName)
+        {
+            auto savePath =
+                std::filesystem::path("Scenes") / (name + ".json");
+
+            if (fileSystem.Exists(savePath))
+            {
+                ImGui::TextDisabled("Warning: Existing scene will be overwritten.");
+            }
+        }
+
+        ImGui::BeginDisabled(!validName);
+
+        if (ImGui::Button("Save"))
+        {
+            std::filesystem::path savePath =
+                std::filesystem::path("Scenes") / (name + ".json");
+
+            m_PendingRequest = {
+                EditorAction::SaveScene,
+                savePath
+            };
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    // LOAD WINDOW
+    if (ImGui::BeginPopupModal(
+        "Load Scene",
+        nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Available Scenes:");
+
+        ImGui::BeginChild(
+            "SceneList",
+            ImVec2(400, 220),
+            true
+        );
+
+        std::vector<FileSystem::FileEntry> entries;
+
+        if (fileSystem.ListDirectory("Scenes", entries))
+        {
+            bool foundScene = false;
+
+            for (const auto& entry : entries)
+            {
+                if (entry.IsDirectory)
+                    continue;
+
+                if (entry.Path.extension() != ".json")
+                    continue;
+
+                foundScene = true;
+
+                std::string filename =
+                    entry.Path.filename().string();
+
+                bool selected =
+                    m_SelectedLoadPath == entry.Path;
+
+                if (ImGui::Selectable(
+                    filename.c_str(),
+                    selected))
+                {
+                    m_SelectedLoadPath = entry.Path;
+                }
+            }
+
+            if (!foundScene)
+            {
+                ImGui::TextDisabled("No scenes found.");
+            }
+        }
+        else
+        {
+            ImGui::TextDisabled("Could not read Scenes directory.");
+        }
+
+        ImGui::EndChild();
+
+        ImGui::BeginDisabled(m_SelectedLoadPath.empty());
+
+        if (ImGui::Button("Load"))
+        {
+            m_PendingRequest = {
+                EditorAction::LoadScene,
+                m_SelectedLoadPath
+            };
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }

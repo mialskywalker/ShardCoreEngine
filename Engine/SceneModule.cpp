@@ -25,24 +25,31 @@ void SceneModule::Update(float deltaTime)
 		current->Update(deltaTime);
 	}
 
-	if (m_HasPendingScene)
+	if (m_PendingScene)
 	{
-		auto newScene = std::make_unique<Scene>(m_PendingSceneName);
-		if (newScene->Init())
-		{
-			m_ActiveScene = std::move(newScene);
-		}
-		else
-		{
-			Logger::Error(m_PendingSceneName + " scene could not be created!", LogType::Engine);
-		}
-
-		m_HasPendingScene = false;
+		m_ActiveScene = std::move(m_PendingScene);
 	}
 }
 
 void SceneModule::RequestSceneChange(const std::string& name)
 {
-	m_PendingSceneName = name;
-	m_HasPendingScene = true;
+	std::unique_ptr<Scene> newScene = std::make_unique<Scene>(name);
+	if (!newScene->Init())
+	{
+		Logger::Error("Request Scene Change FAILED!", LogType::Engine);
+		return;
+	}
+
+	m_PendingScene = std::move(newScene);
+}
+
+bool SceneModule::RequestSceneChange(std::unique_ptr<Scene> scene)
+{
+	if (!scene)
+	{
+		return false;
+	}
+
+	m_PendingScene = std::move(scene);
+	return true;
 }

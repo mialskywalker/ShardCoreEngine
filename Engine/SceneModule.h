@@ -16,9 +16,9 @@ public:
 
 	void Update(float deltaTime);
 	void RequestSceneChange(const std::string& name);
+	bool RequestSceneChange(std::unique_ptr<Scene> scene);
 
 private:
 	std::unique_ptr<Scene> m_ActiveScene;
-	bool m_HasPendingScene = false;
-	std::string m_PendingSceneName;
+	std::unique_ptr<Scene> m_PendingScene;
 };

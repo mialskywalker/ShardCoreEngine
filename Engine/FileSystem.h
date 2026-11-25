@@ -7,13 +7,13 @@
 
 class FileSystem
 {
+public:
 	struct FileEntry
 	{
 		std::filesystem::path Path;
 		bool IsDirectory = false;
 	};
 
-public:
 	bool Init(const std::filesystem::path& projectRoot);
 
 	std::filesystem::path ResolvePath(const std::filesystem::path& path) const;

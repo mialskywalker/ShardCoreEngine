@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "EditorUI.h"
 #include "EditorCamera.h"
+#include <filesystem>
 
 class EditorApplication : public Application
 {
@@ -19,4 +20,6 @@ protected:
 private:
     EditorUI m_EditorUI;
     EditorCamera m_EditorCamera;
+
+    std::filesystem::path m_CurrentScenePath;
 };

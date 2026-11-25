@@ -11,6 +11,8 @@ class WindowHierarchy
 public:
 	void Draw(Scene* scene);
 
+	void ClearSelection();
+
 	uint64_t GetSelectedUID() const { return m_SelectedUID; }
 
 private:
