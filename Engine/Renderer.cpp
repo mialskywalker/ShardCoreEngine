@@ -10,9 +10,7 @@
 #include "DebugDraw.h"
 #include "Scene.h"
 #include "Mesh.h"
-#include "MeshPrimitives.h"
 #include "GameObject.h"
-#include "MeshLibrary.h"
 
 #include "TransformComponent.h"
 #include "MeshComponent.h"
@@ -49,10 +47,6 @@ bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
 	// DebugDraw init
 	m_DebugDraw = std::make_unique<DebugDraw>();
 	ok = ok && m_DebugDraw->Init(*m_D3D12Module);
-
-	// MeshLibrary init
-	m_MeshLibrary = std::make_unique<MeshLibrary>();
-	ok = ok && m_MeshLibrary->Init(*m_ResourceModule);
 
 	return ok;
 }

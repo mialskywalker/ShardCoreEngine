@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "TransformComponent.h"
 
+
 Application::Application() {}
 
 Application::~Application() {}
@@ -70,6 +71,8 @@ bool Application::Init()
 	go1->GetTransform()->SetPosition(Vector3(2.0f, 1.0f, 0.0f));
 	go1->GetTransform()->SetRotation(Quaternion(0.0f, 0.0f, 0.0f, 1.0f));
 	go1->GetTransform()->SetScale(Vector3(1.0f, 2.0f, 2.0f));
+
+
 	// test end
 
 	// scene serializer test

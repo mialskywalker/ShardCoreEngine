@@ -14,7 +14,6 @@ class Scene;
 class WindowLogger;
 class WindowHierarchy;
 class WindowInspector;
-class MeshLibrary;
 class Camera;
 
 class EditorUI
@@ -29,7 +28,7 @@ public:
 	void Shutdown();
 
 public:
-	void Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture, Camera& camera);
+	void Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera);
 
 	bool IsSceneHovered() const { return m_WindowViewport.IsHovered(); }
 	uint32_t GetViewportWidth() const { return m_WindowViewport.GetWidth(); }

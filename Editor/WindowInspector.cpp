@@ -3,14 +3,13 @@
 
 #include "Scene.h"
 #include "GameObject.h"
-#include "MeshLibrary.h"
 
 #include "TransformComponent.h"
 #include "MeshComponent.h"
 
 #include <cstdio>
 
-void WindowInspector::Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* meshLibrary)
+void WindowInspector::Draw(Scene* scene, uint64_t selectedUID)
 {
 	ImGui::Begin("Inspector");
 
@@ -53,7 +52,7 @@ void WindowInspector::Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* mesh
 
             // Components
             ImGui::Separator();
-            DrawComponents(go, meshLibrary);
+            DrawComponents(go);
 
             // Add Component
             ImGui::Spacing();
@@ -71,7 +70,7 @@ void WindowInspector::Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* mesh
 	ImGui::End();
 }
 
-void WindowInspector::DrawComponents(GameObject* go, MeshLibrary* meshLibrary)
+void WindowInspector::DrawComponents(GameObject* go)
 {
     if (auto* transform = go->GetTransform())
     {
@@ -95,10 +94,10 @@ void WindowInspector::DrawComponents(GameObject* go, MeshLibrary* meshLibrary)
             ImGui::EndPopup();
         }
 
-        if (meshOpen)
+        /*if (meshOpen)
         {
             DrawMeshComponent(mesh, meshLibrary);
-        }
+        }*/
     }
 }
 
@@ -211,66 +210,66 @@ void WindowInspector::DrawTransformComponent(TransformComponent* transform)
     }
 }
 
-void WindowInspector::DrawMeshComponent(MeshComponent* mesh, MeshLibrary* meshLibrary)
-{
-    if (!mesh || !meshLibrary)
-    {
-        return;
-    }
-
-    struct MeshOption
-    {
-        const char* name;
-        PrimitiveMeshType type;
-    };
-
-    const MeshOption options[] =
-    {
-        { "Triangle", PrimitiveMeshType::Triangle },
-        { "Quad",     PrimitiveMeshType::Quad },
-        { "Cube",     PrimitiveMeshType::Cube }
-    };
-
-    // Determine currently selected mesh
-    const char* selectedName = "None";
-    Mesh* currentMesh = mesh->GetMesh();
-
-    for (const auto& option : options)
-    {
-        if (currentMesh == meshLibrary->GetPrimitive(option.type).get() && currentMesh != nullptr)
-        {
-            selectedName = option.name;
-            break;
-        }
-    }
-
-    // Mesh selection dropdown
-    if (ImGui::BeginCombo("Primitive Mesh", selectedName))
-    {
-        // None option
-        if (ImGui::Selectable("None", currentMesh == nullptr))
-        {
-            mesh->SetMesh(nullptr);
-        }
-
-        // Available primitives
-        for (const auto& option : options)
-        {
-            auto primitive = meshLibrary->GetPrimitive(option.type);
-
-            bool isSelected = currentMesh == primitive.get() && primitive != nullptr;
-
-            if (ImGui::Selectable(option.name, isSelected))
-            {
-                mesh->SetMesh(primitive);
-            }
-
-            if (isSelected)
-            {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-
-        ImGui::EndCombo();
-    }
-}
+//void WindowInspector::DrawMeshComponent(MeshComponent* mesh, MeshLibrary* meshLibrary)
+//{
+//    if (!mesh || !meshLibrary)
+//    {
+//        return;
+//    }
+//
+//    struct MeshOption
+//    {
+//        const char* name;
+//        PrimitiveMeshType type;
+//    };
+//
+//    const MeshOption options[] =
+//    {
+//        { "Triangle", PrimitiveMeshType::Triangle },
+//        { "Quad",     PrimitiveMeshType::Quad },
+//        { "Cube",     PrimitiveMeshType::Cube }
+//    };
+//
+//    // Determine currently selected mesh
+//    const char* selectedName = "None";
+//    Mesh* currentMesh = mesh->GetMesh();
+//
+//    for (const auto& option : options)
+//    {
+//        if (currentMesh == meshLibrary->GetPrimitive(option.type).get() && currentMesh != nullptr)
+//        {
+//            selectedName = option.name;
+//            break;
+//        }
+//    }
+//
+//    // Mesh selection dropdown
+//    if (ImGui::BeginCombo("Primitive Mesh", selectedName))
+//    {
+//        // None option
+//        if (ImGui::Selectable("None", currentMesh == nullptr))
+//        {
+//            mesh->SetMesh(nullptr);
+//        }
+//
+//        // Available primitives
+//        for (const auto& option : options)
+//        {
+//            auto primitive = meshLibrary->GetPrimitive(option.type);
+//
+//            bool isSelected = currentMesh == primitive.get() && primitive != nullptr;
+//
+//            if (ImGui::Selectable(option.name, isSelected))
+//            {
+//                mesh->SetMesh(primitive);
+//            }
+//
+//            if (isSelected)
+//            {
+//                ImGui::SetItemDefaultFocus();
+//            }
+//        }
+//
+//        ImGui::EndCombo();
+//    }
+//}

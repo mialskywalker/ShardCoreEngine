@@ -8,20 +8,19 @@ class Scene;
 class GameObject;
 class TransformComponent;
 class MeshComponent;
-class MeshLibrary;
 
 using DirectX::SimpleMath::Quaternion;
 
 class WindowInspector
 {
 public:
-    void Draw(Scene* scene, uint64_t selectedUID, MeshLibrary* meshLibrary);
+    void Draw(Scene* scene, uint64_t selectedUID);
 
 private:
-    void DrawComponents(GameObject* go, MeshLibrary* meshLibrary);
+    void DrawComponents(GameObject* go);
     void DrawAddComponent(GameObject* go);
     void DrawTransformComponent(TransformComponent* transform);
-    void DrawMeshComponent(MeshComponent* mesh, MeshLibrary* meshLibrary);
+    //void DrawMeshComponent(MeshComponent* mesh, MeshLibrary* meshLibrary);
 
 private:
     char m_NameBuffer[128] = {};

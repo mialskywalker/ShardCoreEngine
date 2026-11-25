@@ -1,7 +1,6 @@
 #include "EditorApplication.h"
 #include "D3D12Module.h"
 #include "ShaderDescriptorModule.h"
-#include "MeshLibrary.h"
 #include "RenderTexture.h"
 #include "imgui_impl_win32.h"
 
@@ -56,7 +55,7 @@ void EditorApplication::OnBeginFrame()
 	m_EditorUI.BeginFrame();
 
 	ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode); // Enable ImGui Docking
-	m_EditorUI.Draw(GetActiveScene(), GetRenderer().GetMeshLibrary(), GetRenderer().GetSceneRenderTexture(), m_EditorCamera.GetCamera()); // Draw ImGui Windows
+	m_EditorUI.Draw(GetActiveScene(), GetRenderer().GetSceneRenderTexture(), m_EditorCamera.GetCamera()); // Draw ImGui Windows
 	GetRenderer().RequestSceneResize(m_EditorUI.GetViewportWidth(), m_EditorUI.GetViewportHeight()); // Window resize
 }
 

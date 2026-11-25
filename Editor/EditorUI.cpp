@@ -11,8 +11,6 @@
 #include "WindowHierarchy.h"
 #include "WindowInspector.h"
 
-#include "MeshLibrary.h"
-
 EditorUI::EditorUI() {}
 
 EditorUI::~EditorUI() {}
@@ -121,11 +119,11 @@ void EditorUI::Shutdown()
 	ImGui::DestroyContext();
 }
 
-void EditorUI::Draw(Scene* activeScene, MeshLibrary* meshLibrary, RenderTexture* renderTexture, Camera& camera)
+void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera)
 {
 	m_WindowLogger->Draw();
 	m_WindowHierarchy->Draw(activeScene);
-	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID(), meshLibrary);
+	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID());
 
 	ImGui::Begin("Editor Settings");
 	ImGui::Checkbox("Show Grid", &m_Settings.ShowGrid);

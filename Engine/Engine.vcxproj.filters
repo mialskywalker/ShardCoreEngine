@@ -84,14 +84,8 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MeshPrimitives.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshLibrary.cpp">
-      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="RenderTexture.cpp">
       <Filter>Renderer</Filter>
@@ -173,14 +167,8 @@
     <ClInclude Include="MeshData.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MeshPrimitives.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="MeshComponent.h">
       <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshLibrary.h">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="RenderTexture.h">
       <Filter>Renderer</Filter>

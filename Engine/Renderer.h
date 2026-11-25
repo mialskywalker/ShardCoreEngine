@@ -18,7 +18,6 @@ class RenderTexture;
 class Camera;
 class DebugDraw;
 class Scene;
-class MeshLibrary;
 
 class Renderer
 {
@@ -46,7 +45,6 @@ private:
 	std::unique_ptr<ShaderDescriptorModule>		m_ShaderDescriptorModule;
 	std::unique_ptr<RenderTexture>				m_SceneRenderTexture;
 	std::unique_ptr<DebugDraw>					m_DebugDraw;
-	std::unique_ptr<MeshLibrary>				m_MeshLibrary;
 
 	uint32_t m_RequestedSceneWidth = 0;
 	uint32_t m_RequestedSceneHeight = 0;
@@ -57,5 +55,4 @@ public:
 	ShaderDescriptorModule* GetShaderDescriptors() const { return m_ShaderDescriptorModule.get(); }
 	RenderTexture* GetSceneRenderTexture() const { return m_SceneRenderTexture.get(); }
 	DebugDraw* GetDebugDraw() const { return m_DebugDraw.get(); }
-	MeshLibrary* GetMeshLibrary() const { return m_MeshLibrary.get(); }	
 };
