@@ -23,6 +23,7 @@ public:
 	bool RemoveGameObject(uint64_t uid);
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return m_GameObjects; }
 	const std::string& GetSceneName() const { return m_Name; }
+	void SetName(const std::string& name);
 
 private:
 	std::string m_Name;

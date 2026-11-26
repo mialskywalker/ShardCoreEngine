@@ -7,11 +7,15 @@ void WindowHierarchy::Draw(Scene* scene)
 {
 	ImGui::Begin("Hierarchy");
 
+    if (scene && m_SceneName != scene->GetSceneName())
+    {
+        m_SceneName = scene->GetSceneName();
+    }
+
     if (scene != m_LastScene)
     {
         m_SelectedUID = 0;
         m_LastScene = scene;
-        m_SceneName = scene->GetSceneName();
     }
 
     if (scene && m_SelectedUID != 0)

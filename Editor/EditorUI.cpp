@@ -367,6 +367,8 @@ void EditorUI::DrawFileMenu(
                 savePath
             };
 
+            activeScene->SetName(name);
+
             ImGui::CloseCurrentPopup();
         }
 

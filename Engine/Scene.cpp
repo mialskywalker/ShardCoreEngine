@@ -162,3 +162,14 @@ bool Scene::RemoveGameObject(uint64_t uid)
 	m_GameObjects.erase(it);
 	return true;
 }
+
+void Scene::SetName(const std::string& name)
+{
+	if (name == "")
+	{
+		return;
+	}
+
+	m_Name = name;
+}
+

@@ -31,6 +31,9 @@
     <Filter Include="Core\FileSystem">
       <UniqueIdentifier>{94421fdf-a290-45e3-adee-1791f9bd1d80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{9e9cf49d-1502-4120-b63e-80af802ed62a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -181,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="SceneSerializer.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetTypes.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetRecord.h">
+      <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
