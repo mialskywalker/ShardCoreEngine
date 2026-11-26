@@ -7,6 +7,9 @@
 #include "Scene.h"
 #include "SceneSerializer.h"
 
+#include "AssetMetadataSerializer.h"
+#include "AssetIDGenerator.h"
+
 Application::Application() {}
 
 Application::~Application() {}
@@ -56,6 +59,17 @@ bool Application::Init()
 
 	std::string root = m_FileSystem.GetProjectRoot().string();
 	Logger::Log(root.c_str(), LogType::Engine);
+
+	// Testing
+	AssetIDGenerator gen;
+	AssetMetadata met;
+	//met.ID = gen.Generate();
+	//met.Type = AssetType::Texture;
+
+	AssetMetadataSerializer ser(m_FileSystem);
+	//ser.SaveMetadata("Assets/player.png", met);
+	ser.LoadMetadata("Assets/player.png", met);
+
 
 	return ok;
 }

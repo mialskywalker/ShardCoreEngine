@@ -142,6 +142,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="AssetIDGenerator.cpp" />
+    <ClCompile Include="AssetMetadataSerializer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
@@ -166,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="AssetIDGenerator.h" />
+    <ClInclude Include="AssetMetadata.h" />
+    <ClInclude Include="AssetMetadataSerializer.h" />
     <ClInclude Include="AssetRecord.h" />
     <ClInclude Include="AssetTypes.h" />
     <ClInclude Include="Camera.h" />

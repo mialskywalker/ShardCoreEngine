@@ -102,6 +102,12 @@
     <ClCompile Include="SceneSerializer.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="AssetIDGenerator.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetMetadataSerializer.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -189,6 +195,15 @@
       <Filter>Assets</Filter>
     </ClInclude>
     <ClInclude Include="AssetRecord.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetIDGenerator.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetMetadata.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetMetadataSerializer.h">
       <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>
