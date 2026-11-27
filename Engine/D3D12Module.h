@@ -102,7 +102,7 @@ public:
 	ID3D12PipelineState*			GetPipelineStateObject() const { return m_PipelineStateObject.Get(); }
 	ID3D12PipelineState*			GetDebugPipelineStateObject() const { return m_DebugPipelineStateObject.Get(); }
 
-	void							WaitForGPU();
+	bool							WaitForGPU();
 	void							Resize();
 	//void							ToggleFullscreen();
 };

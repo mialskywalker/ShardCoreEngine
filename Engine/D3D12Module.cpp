@@ -4,10 +4,18 @@
 #include "ResourceModule.h"
 #include "ReadData.h"
 #include <SimpleMath.h>
+#include <cstdlib>
 
 D3D12Module::D3D12Module() {}
 
-D3D12Module::~D3D12Module() {}
+D3D12Module::~D3D12Module() 
+{
+	if (m_FenceEvent)
+	{
+		CloseHandle(m_FenceEvent);
+		m_FenceEvent = nullptr;
+	}
+}
 
 bool D3D12Module::Init(HWND hwnd)
 {
@@ -293,22 +301,52 @@ void D3D12Module::GetWindowSize(uint32_t& width, uint32_t& height)
 	height = clientRect.bottom - clientRect.top;
 }
 
-void D3D12Module::WaitForGPU()
+bool D3D12Module::WaitForGPU()
 {
-	// tell the gpu queue when it reaches this value that the cpu can continue after that
-	m_CommandQueue->Signal(m_Fence.Get(), m_FenceValue);
-
-	// check if the gpu has used this frame - if yes -> ensure it has finished
-	if (m_Fence->GetCompletedValue() < m_FenceValue)
+	if (!m_CommandQueue || !m_Fence || !m_FenceEvent)
 	{
-		// signal when fence reaches a value
-		m_Fence->SetEventOnCompletion(m_FenceValue, m_FenceEvent);
-		// CPU blocked while GPU reaches that value
-		WaitForSingleObject(m_FenceEvent, INFINITE);
+		return false;
 	}
 
-	// start a new frame
-	m_FenceValue++;
+	const UINT64 fenceValue = m_FenceValue;
+
+	// tell the gpu queue when it reaches this value that the cpu can continue after that
+	HRESULT hr = m_CommandQueue->Signal(m_Fence.Get(), fenceValue);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	m_FenceValue++; // increase fence value for the next frame
+
+	const UINT64 completedValue = m_Fence->GetCompletedValue();
+
+	if (completedValue == UINT64_MAX)
+	{
+		return false;
+	}
+
+	// check if the gpu has used this frame - if yes -> ensure it has finished
+	if (completedValue < fenceValue)
+	{
+		// signal when fence reaches a value
+		hr = m_Fence->SetEventOnCompletion(fenceValue, m_FenceEvent);
+		if (FAILED(hr))
+		{
+			return false;
+		}
+
+		// CPU blocked while GPU reaches that value
+		const DWORD result = WaitForSingleObject(m_FenceEvent, INFINITE);
+		if (result != WAIT_OBJECT_0)
+		{
+			return false;
+		}
+	}
+
+	const UINT64 finalCompletedValue = m_Fence->GetCompletedValue();
+
+	return finalCompletedValue != UINT64_MAX &&	finalCompletedValue >= fenceValue;
 }
 
 void D3D12Module::Resize()
@@ -326,7 +364,10 @@ void D3D12Module::Resize()
 		m_Width = width;
 		m_Height = height;
 
-		WaitForGPU();
+		if (!WaitForGPU())
+		{
+			std::abort();
+		}
 
 		for (uint32_t i = 0; i < m_FramesInFlight; ++i)
 		{

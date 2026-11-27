@@ -16,12 +16,16 @@
 #include "MeshComponent.h"
 
 #include <SimpleMath.h>
+#include <cstdlib>
 
 Renderer::Renderer() {}
 
 Renderer::~Renderer() 
 {
-	m_DebugDraw->Shutdown();
+	if (m_DebugDraw)
+	{
+		m_DebugDraw->Shutdown();
+	}
 }
 
 bool Renderer::Init(HWND hwnd, uint32_t width, uint32_t height)
@@ -93,7 +97,10 @@ void Renderer::PostRender()
 	m_D3D12Module->EndFrame();
 
 	// Flush
-	m_D3D12Module->WaitForGPU();
+	if (!m_D3D12Module->WaitForGPU())
+	{
+		std::abort();
+	}
 }
 
 void Renderer::RenderSceneToTexture(Camera& camera, Scene* scene)

@@ -2,6 +2,7 @@
 #include "D3D12Module.h"
 #include "ShaderDescriptorModule.h"
 #include "d3dx12.h"
+#include <cstdlib>
 
 RenderTexture::~RenderTexture()
 {
@@ -112,7 +113,10 @@ bool RenderTexture::Resize(uint32_t width, uint32_t height)
     }
 
     // Ensure GPU has finished using old resources
-    m_D3D12->WaitForGPU();
+    if (!m_D3D12->WaitForGPU())
+    {
+        std::abort();
+    }
 
     auto* device = m_D3D12->GetDevice();
 

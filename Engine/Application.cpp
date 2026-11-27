@@ -8,6 +8,7 @@
 #include "SceneSerializer.h"
 #include "AssetRegistry.h"
 #include "ResourceManager.h"
+#include <cstdlib>
 
 Application::Application() {}
 
@@ -15,7 +16,10 @@ Application::~Application()
 {
     if (m_Renderer.GetD3D12())
     {
-        m_Renderer.GetD3D12()->WaitForGPU();
+        if (!m_Renderer.GetD3D12()->WaitForGPU())
+        {
+            std::abort();
+        }
     }
 
     m_SceneModule.reset();
