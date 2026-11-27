@@ -188,3 +188,76 @@ bool FileSystem::ListDirectory(const std::filesystem::path& directory, std::vect
 
 	return true;
 }
+
+bool FileSystem::ListFilesRecursive(const std::filesystem::path& directory, std::vector<std::filesystem::path>& outFiles) const
+{
+	outFiles.clear();
+
+	if (directory.empty())
+	{
+		return false;
+	}
+
+	std::filesystem::path resolvedPath = ResolvePath(directory);
+	std::error_code ec;
+	
+	if (!std::filesystem::is_directory(resolvedPath, ec))
+	{
+		return false;
+	}
+
+	std::filesystem::recursive_directory_iterator it(resolvedPath, ec);
+	std::filesystem::recursive_directory_iterator end;
+
+	if (ec)
+	{
+		return false;
+	}
+
+	while (it != end)
+	{
+		bool isSymlink = it->is_symlink(ec);
+
+		if (ec)
+		{
+			outFiles.clear();
+			return false;
+		}
+
+		if (!isSymlink)
+		{
+			bool isFile = it->is_regular_file(ec);
+
+			if (ec)
+			{
+				outFiles.clear();
+				return false;
+			}
+
+			if (isFile)
+			{
+				std::filesystem::path relativePath = it->path().lexically_relative(m_ProjectRoot);
+
+				if (relativePath.empty() || *relativePath.begin() == "..")
+				{
+					outFiles.clear();
+					return false;
+				}
+
+				outFiles.push_back(relativePath);
+			}
+		}
+
+		it.increment(ec);
+
+		if (ec)
+		{
+			outFiles.clear();
+			return false;
+		}
+	}
+
+	std::sort(outFiles.begin(), outFiles.end());
+
+	return true;
+}

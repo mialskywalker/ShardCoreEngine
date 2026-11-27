@@ -108,6 +108,12 @@
     <ClCompile Include="AssetMetadataSerializer.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
+    <ClCompile Include="AssetRegistry.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetTypeUtils.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -204,6 +210,12 @@
       <Filter>Assets</Filter>
     </ClInclude>
     <ClInclude Include="AssetMetadataSerializer.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetRegistry.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetTypeUtils.h">
       <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>

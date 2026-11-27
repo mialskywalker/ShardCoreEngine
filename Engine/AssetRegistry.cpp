@@ -1,0 +1,452 @@
+#include "AssetRegistry.h"
+#include "FileSystem.h"
+#include "Logger.h"
+#include "AssetTypeUtils.h"
+
+AssetRegistry::AssetRegistry(const FileSystem& fileSystem)
+	: m_FileSystem(fileSystem), m_MetadataSerializer(fileSystem)
+{
+}
+
+AssetID AssetRegistry::CreateAsset(AssetType type, const std::string& name, const std::filesystem::path& sourcePath)
+{
+	if (type == AssetType::Unknown)
+	{
+		return InvalidAssetID;
+	}
+
+	if (name.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	if (sourcePath.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	if (sourcePath.is_absolute())
+	{
+		return InvalidAssetID;
+	}
+
+	std::filesystem::path normalizedPath = NormalizeAssetPath(sourcePath);
+	if (normalizedPath.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	if (ContainsPath(normalizedPath))
+	{
+		return InvalidAssetID;
+	}
+
+	AssetID id = GenerateUniqueID();
+	AssetRecord record;
+	record.ID = id;
+	record.Type = type;
+	record.Name = name;
+	record.SourcePath = normalizedPath;
+	
+	if (!RegisterAsset(record))
+	{
+		return InvalidAssetID;
+	}
+
+	return id;
+}
+
+AssetID AssetRegistry::LoadExistingAsset(const std::filesystem::path& sourcePath)
+{
+	std::filesystem::path normalizedPath = NormalizeAssetPath(sourcePath);
+	if (normalizedPath.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	AssetID existingID = GetAssetIDByPath(normalizedPath);
+	if (existingID != InvalidAssetID)
+	{
+		return existingID;
+	}
+
+	if (!m_FileSystem.Exists(normalizedPath))
+	{
+		return InvalidAssetID;
+	}
+
+	AssetType detectedType = AssetTypeUtils::DetectAssetType(normalizedPath);
+	if (detectedType == AssetType::Unknown)
+	{
+		return InvalidAssetID;
+	}
+
+	// load metadata
+	AssetMetadata metadata;
+	if (!m_MetadataSerializer.LoadMetadata(normalizedPath, metadata))
+	{
+		return InvalidAssetID;
+	}
+
+	if (metadata.Type != detectedType)
+	{
+		return InvalidAssetID;
+	}
+
+	if (Contains(metadata.ID))
+	{
+		return InvalidAssetID;
+	}
+
+	// create assetrecord
+	AssetRecord record;
+	record.ID = metadata.ID;
+	record.Type = metadata.Type;
+	record.Name = normalizedPath.stem().string();
+	record.SourcePath = normalizedPath;
+	record.ParentAssetID = InvalidAssetID;
+
+	if (!RegisterAsset(record))
+	{
+		return InvalidAssetID;
+	}
+
+	return record.ID;
+}
+
+AssetID AssetRegistry::RegisterNewAsset(const std::filesystem::path& sourcePath)
+{
+	std::filesystem::path normalizedPath = NormalizeAssetPath(sourcePath);
+	if (normalizedPath.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	AssetID existingID = GetAssetIDByPath(normalizedPath);
+	if (existingID != InvalidAssetID)
+	{
+		return existingID;
+	}
+
+	if (!m_FileSystem.Exists(normalizedPath))
+	{
+		return InvalidAssetID;
+	}
+
+	AssetType detectedType = AssetTypeUtils::DetectAssetType(normalizedPath);
+	if (detectedType == AssetType::Unknown)
+	{
+		return InvalidAssetID;
+	}
+
+	std::filesystem::path metadataPath = AssetMetadataSerializer::GetMetadataPath(normalizedPath);
+	if (m_FileSystem.Exists(metadataPath))
+	{
+		return InvalidAssetID;
+	}
+
+	std::string name = normalizedPath.stem().string();
+	AssetID id = CreateAsset(detectedType, name, normalizedPath);
+	if (id == InvalidAssetID)
+	{
+		return InvalidAssetID;
+	}
+
+	AssetMetadata metadata;
+	metadata.Version = AssetMetadataVersion;
+	metadata.ID = id;
+	metadata.Type = detectedType;
+
+	if (!m_MetadataSerializer.SaveMetadata(normalizedPath, metadata))
+	{
+		RemoveAsset(id);
+		return InvalidAssetID;
+	}
+
+	return id;
+}
+
+bool AssetRegistry::DiscoverAssets(const std::filesystem::path& directory, std::vector<DiscoveredAsset>& outAssets) const
+{
+	outAssets.clear();
+
+	if (directory.empty())
+	{
+		return false;
+	}
+
+	std::vector<std::filesystem::path> files;
+	if (!m_FileSystem.ListFilesRecursive(directory, files))
+	{
+		return false;
+	}
+
+	for (const auto& file : files)
+	{
+		AssetType type = AssetTypeUtils::DetectAssetType(file);
+		if (type == AssetType::Unknown)
+		{
+			continue;
+		}
+
+		DiscoveredAsset asset;
+		asset.SourcePath = file;
+		asset.Type = type;
+
+		outAssets.push_back(asset);
+	}
+
+	return true;
+}
+
+bool AssetRegistry::RegisterAsset(const AssetRecord& record)
+{
+	if (!record.IsValid())
+	{
+		return false;
+	}
+
+	if (Contains(record.ID))
+	{
+		return false;
+	}
+
+	if (record.ParentAssetID == record.ID)
+	{
+		return false;
+	}
+
+	AssetRecord rec = record;
+	std::filesystem::path normalizedPath = NormalizeAssetPath(rec.SourcePath);
+	if (normalizedPath.empty())
+	{
+		return false;
+	}
+
+	rec.SourcePath = normalizedPath;
+	if (!rec.IsSubAsset())
+	{
+		if (ContainsPath(rec.SourcePath))
+		{
+			return false;
+		}
+	}
+
+	auto res = m_Assets.emplace(rec.ID, rec);
+	if (res.second)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool AssetRegistry::Contains(AssetID id) const
+{
+	if (id == InvalidAssetID)
+	{
+		return false;
+	}
+
+	return m_Assets.find(id) != m_Assets.end();
+}
+
+bool AssetRegistry::ContainsPath(const std::filesystem::path& sourcePath) const
+{
+	if (GetAssetIDByPath(sourcePath) != InvalidAssetID)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+AssetID AssetRegistry::GetAssetIDByPath(const std::filesystem::path& sourcePath) const
+{
+	std::filesystem::path normalizedPath = NormalizeAssetPath(sourcePath);
+	if (normalizedPath.empty())
+	{
+		return InvalidAssetID;
+	}
+
+	for (const auto& [id, record] : m_Assets)
+	{
+		if (record.IsSubAsset())
+		{
+			continue;
+		}
+
+		if (record.SourcePath == normalizedPath)
+		{
+			return record.ID;
+		}
+	}
+
+	return InvalidAssetID;
+}
+
+std::vector<AssetID> AssetRegistry::GetAssetIDsByPath(const std::filesystem::path& sourcePath) const
+{
+	std::vector<AssetID> assetIDs;
+	std::filesystem::path normalizedPath = NormalizeAssetPath(sourcePath);
+	if (normalizedPath.empty())
+	{
+		return assetIDs;
+	}
+
+	for (const auto& [id, record] : m_Assets)
+	{
+		if (record.SourcePath == normalizedPath)
+		{
+			assetIDs.push_back(record.ID);
+		}
+	}
+
+	return assetIDs;
+}
+
+const AssetRecord* AssetRegistry::GetAsset(AssetID id) const
+{
+	auto it = m_Assets.find(id);
+	if (it == m_Assets.end())
+	{
+		return nullptr;
+	}
+
+	return &it->second;
+}
+
+bool AssetRegistry::RemoveAsset(AssetID id)
+{
+	if (m_Assets.erase(id))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool AssetRegistry::ScanAssets(const std::filesystem::path& directory)
+{
+	std::vector<DiscoveredAsset> discoveredAssets;
+	if (!DiscoverAssets(directory, discoveredAssets))
+	{
+		return false;
+	}
+
+	std::vector<DiscoveredAsset> newAssets;
+	bool success = true;
+	size_t loadedCount = 0;
+	size_t createdCount = 0;
+	size_t failedCount = 0;
+	size_t skippedCount = 0;
+
+	for (const DiscoveredAsset& asset : discoveredAssets)
+	{
+		if (ContainsPath(asset.SourcePath))
+		{
+			skippedCount++;
+			continue;
+		}
+
+		std::filesystem::path metadataPath = AssetMetadataSerializer::GetMetadataPath(asset.SourcePath);
+		if (!m_FileSystem.Exists(metadataPath))
+		{
+			newAssets.push_back(asset);
+			continue;
+		}
+
+		AssetID id = LoadExistingAsset(asset.SourcePath);
+		if (id == InvalidAssetID)
+		{
+			success = false;
+			failedCount++;
+			continue;
+		}
+
+		loadedCount++;
+	}
+
+	if (!success)
+	{
+		return false;
+	}
+
+	for (const DiscoveredAsset& asset : newAssets)
+	{
+		AssetID id = RegisterNewAsset(asset.SourcePath);
+		if (id == InvalidAssetID)
+		{
+			success = false;
+			failedCount++;
+			continue;
+		}
+
+		createdCount++;
+	}
+
+	Logger::Log("[AssetRegistry] Asset scan completed.", LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Discovered: " +
+		std::to_string(discoveredAssets.size()), LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Loaded: " +
+		std::to_string(loadedCount), LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Created: " +
+		std::to_string(createdCount), LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Skipped: " +
+		std::to_string(skippedCount), LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Failed: " +
+		std::to_string(failedCount), LogType::Engine);
+
+	Logger::Log("[AssetRegistry] Total registered assets: " +
+		std::to_string(GetAssetCount()), LogType::Engine);
+
+	return success;
+
+}
+
+size_t AssetRegistry::GetAssetCount() const
+{
+	return m_Assets.size();
+}
+
+void AssetRegistry::Clear()
+{
+	m_Assets.clear();
+}
+
+AssetID AssetRegistry::GenerateUniqueID()
+{
+	AssetID id = InvalidAssetID;
+	do
+	{
+		id = m_IDGenerator.Generate();
+	} while (id == InvalidAssetID || Contains(id));
+
+	return id;
+}
+
+std::filesystem::path AssetRegistry::NormalizeAssetPath(const std::filesystem::path& path)
+{
+	if (path.empty())
+	{
+		return std::filesystem::path();
+	}
+
+	if (path.is_absolute() || path.has_root_name() || path.has_root_directory())
+	{
+		return std::filesystem::path();
+	}
+
+	std::filesystem::path normalizedPath = path.lexically_normal();
+	if (normalizedPath.empty() || normalizedPath == "." || *normalizedPath.begin() == "..")
+	{
+		return std::filesystem::path();
+	}
+
+	return normalizedPath;
+}

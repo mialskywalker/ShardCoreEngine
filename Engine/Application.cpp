@@ -7,8 +7,7 @@
 #include "Scene.h"
 #include "SceneSerializer.h"
 
-#include "AssetMetadataSerializer.h"
-#include "AssetIDGenerator.h"
+#include "AssetRegistry.h"
 
 Application::Application() {}
 
@@ -61,15 +60,8 @@ bool Application::Init()
 	Logger::Log(root.c_str(), LogType::Engine);
 
 	// Testing
-	AssetIDGenerator gen;
-	AssetMetadata met;
-	//met.ID = gen.Generate();
-	//met.Type = AssetType::Texture;
-
-	AssetMetadataSerializer ser(m_FileSystem);
-	//ser.SaveMetadata("Assets/player.png", met);
-	ser.LoadMetadata("Assets/player.png", met);
-
+	AssetRegistry asr(m_FileSystem);
+	asr.ScanAssets("Assets");
 
 	return ok;
 }

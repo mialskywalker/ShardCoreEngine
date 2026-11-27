@@ -144,6 +144,8 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AssetIDGenerator.cpp" />
     <ClCompile Include="AssetMetadataSerializer.cpp" />
+    <ClCompile Include="AssetRegistry.cpp" />
+    <ClCompile Include="AssetTypeUtils.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
@@ -172,7 +174,9 @@
     <ClInclude Include="AssetMetadata.h" />
     <ClInclude Include="AssetMetadataSerializer.h" />
     <ClInclude Include="AssetRecord.h" />
+    <ClInclude Include="AssetRegistry.h" />
     <ClInclude Include="AssetTypes.h" />
+    <ClInclude Include="AssetTypeUtils.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />

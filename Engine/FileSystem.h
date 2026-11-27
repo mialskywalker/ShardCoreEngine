@@ -32,6 +32,8 @@ public:
 
 	bool ListDirectory(const std::filesystem::path& directory, std::vector<FileEntry>& outEntries) const;
 
+	bool ListFilesRecursive(const std::filesystem::path& directory, std::vector<std::filesystem::path>& outFiles) const;
+
 	const std::filesystem::path& GetProjectRoot() const { return m_ProjectRoot; }
 
 private:
