@@ -79,6 +79,9 @@
     <ClCompile Include="EditorGizmo.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="WindowContentBrowser.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\imgui\imconfig.h">
@@ -136,6 +139,18 @@
       <Filter>External\ImGuizmo</Filter>
     </ClInclude>
     <ClInclude Include="EditorGizmo.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowContentBrowser.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorIcons.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetVisuals.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorSelection.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

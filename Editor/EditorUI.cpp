@@ -14,12 +14,16 @@
 #include "WindowLogger.h"
 #include "WindowHierarchy.h"
 #include "WindowInspector.h"
+#include "WindowContentBrowser.h"
+#include "AssetRegistry.h"
+#include "ResourceManager.h"
+#include <system_error>
 
 EditorUI::EditorUI() {}
 
 EditorUI::~EditorUI() {}
 
-bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descriptors)
+bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descriptors, const FileSystem& fileSystem, AssetRegistry& assetRegistry, ResourceManager& resourceManager)
 {
 	ImGui::CreateContext();
 
@@ -88,10 +92,15 @@ bool EditorUI::Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descr
 		return false;
 	}
 
-	// init members
-	m_WindowLogger = std::make_unique<WindowLogger>();
-	m_WindowHierarchy = std::make_unique<WindowHierarchy>();
-	m_WindowInspector = std::make_unique<WindowInspector>();
+    m_AssetRegistry = &assetRegistry;
+    m_ResourceManager = &resourceManager;
+
+    // Init members
+    m_WindowLogger = std::make_unique<WindowLogger>();
+    m_WindowHierarchy = std::make_unique<WindowHierarchy>(m_Selection);
+    m_WindowInspector = std::make_unique<WindowInspector>();
+
+    m_WindowContentBrowser = std::make_unique<WindowContentBrowser>(fileSystem, assetRegistry, resourceManager, m_Selection);
 
 	return true;
 }
@@ -118,9 +127,11 @@ void EditorUI::Render(ID3D12GraphicsCommandList* commandList, ShaderDescriptorMo
 
 void EditorUI::Shutdown()
 {
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+    m_WindowContentBrowser.reset();
+
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& camera, const FileSystem& fileSystem, const std::filesystem::path& currentScenePath)
@@ -128,8 +139,12 @@ void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& ca
     DrawFileMenu(activeScene, fileSystem, currentScenePath);
 
 	m_WindowLogger->Draw();
+    ValidateSelection(activeScene, fileSystem);
 	m_WindowHierarchy->Draw(activeScene);
-	m_WindowInspector->Draw(activeScene, m_WindowHierarchy->GetSelectedUID());
+    m_WindowContentBrowser->Draw();
+    ValidateSelection(activeScene, fileSystem);
+    m_WindowInspector->Draw(activeScene, m_Selection, fileSystem,
+                            *m_AssetRegistry, *m_ResourceManager);
 
 	ImGui::Begin("Editor Settings");
 	ImGui::Checkbox("Show Grid", &m_Settings.ShowGrid);
@@ -138,9 +153,9 @@ void EditorUI::Draw(Scene* activeScene, RenderTexture* renderTexture, Camera& ca
 	// ImGuizmo
 	GameObject* selectedObject = nullptr;
 
-	if (activeScene)
+	if (activeScene && m_Selection.GetType() == EditorSelectionType::GameObject)
 	{
-		selectedObject = activeScene->GetGameObject(m_WindowHierarchy->GetSelectedUID());
+		selectedObject = activeScene->GetGameObject(m_Selection.GetGameObjectUID());
 	}
 
 	m_WindowViewport.Draw(renderTexture, m_EditorGizmo, camera,	selectedObject);
@@ -156,10 +171,39 @@ EditorUI::EditorRequest EditorUI::ConsumePendingRequest()
 
 void EditorUI::ClearSelection()
 {
-	if (m_WindowHierarchy)
-	{
-		m_WindowHierarchy->ClearSelection();
-	}
+    m_Selection.Clear();
+}
+
+void EditorUI::ValidateSelection(Scene* scene, const FileSystem& fileSystem)
+{
+    if (scene != m_LastSelectionScene)
+    {
+        if (m_Selection.GetType() == EditorSelectionType::GameObject)
+            m_Selection.Clear();
+        m_LastSelectionScene = scene;
+    }
+
+    switch (m_Selection.GetType())
+    {
+    case EditorSelectionType::GameObject:
+        if (!scene || !scene->GetGameObject(m_Selection.GetGameObjectUID()))
+            m_Selection.Clear();
+        break;
+    case EditorSelectionType::Asset:
+        if (!m_AssetRegistry->Contains(m_Selection.GetAssetID()))
+            m_Selection.Clear();
+        break;
+    case EditorSelectionType::Folder:
+    {
+        std::error_code ec;
+        if (!std::filesystem::is_directory(
+                fileSystem.ResolvePath(m_Selection.GetFolder()), ec) || ec)
+            m_Selection.Clear();
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void EditorUI::SetupStyle()
@@ -405,19 +449,29 @@ void EditorUI::SetupStyle()
 
 void EditorUI::SetupFonts()
 {
-	ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
 
-	io.Fonts->AddFontFromFileTTF(
-		"Assets/Fonts/Roboto-Regular.ttf"
-	);
+    // Main editor font
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(
+        "Assets/Fonts/Roboto-Regular.ttf",
+        15.0f
+    );
 
-	ImGui::GetStyle().FontSizeBase = 15.0f;
+    // Merge Font Awesome into Roboto
+    ImFontConfig iconConfig;
+    iconConfig.MergeMode = true;
+    iconConfig.PixelSnapH = true;
+
+    io.Fonts->AddFontFromFileTTF(
+        "Assets/Fonts/fa-solid-900.ttf",
+        15.0f,
+        &iconConfig
+    );
+
+    ImGui::GetStyle().FontSizeBase = 15.0f;
 }
 
-void EditorUI::DrawFileMenu(
-    Scene* activeScene,
-    const FileSystem& fileSystem,
-    const std::filesystem::path& currentScenePath)
+void EditorUI::DrawFileMenu(Scene* activeScene, const FileSystem& fileSystem, const std::filesystem::path& currentScenePath)
 {
     bool openSaveAs = false;
     bool openLoad = false;
@@ -451,6 +505,24 @@ void EditorUI::DrawFileMenu(
             if (ImGui::MenuItem("Load Scene..."))
             {
                 openLoad = true;
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Window"))
+        {
+            if (m_WindowContentBrowser)
+            {
+                bool isOpen = m_WindowContentBrowser->IsOpen();
+
+                if (ImGui::MenuItem(
+                    "Content Browser",
+                    nullptr,
+                    &isOpen))
+                {
+                    m_WindowContentBrowser->SetOpen(isOpen);
+                }
             }
 
             ImGui::EndMenu();

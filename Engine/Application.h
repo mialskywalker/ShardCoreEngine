@@ -9,6 +9,8 @@
 
 class SceneModule;
 class Scene;
+class ResourceManager;
+class AssetRegistry;
 
 class Application
 {
@@ -32,6 +34,8 @@ public:
 	Scene* GetActiveScene() const;
 	FileSystem& GetFileSystem() { return m_FileSystem; }
 	SceneModule& GetSceneModule() const { return *m_SceneModule; }
+	ResourceManager& GetResourceManager() const { return *m_ResourceManager; }
+	AssetRegistry& GetAssetRegistry() const { return *m_AssetRegistry; }
 	
 private:
 	void Update();
@@ -46,6 +50,8 @@ private:
 	FileSystem		m_FileSystem;
 
 	std::unique_ptr<SceneModule> m_SceneModule;
+	std::unique_ptr<ResourceManager> m_ResourceManager;
+	std::unique_ptr<AssetRegistry> m_AssetRegistry;
 
 	float fov = 0.78f;
 };

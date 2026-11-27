@@ -34,7 +34,16 @@ public:
 
 	bool ListFilesRecursive(const std::filesystem::path& directory, std::vector<std::filesystem::path>& outFiles) const;
 
+	bool IsRegularFile(const std::filesystem::path& path) const;
+
+	bool RemoveFile(const std::filesystem::path& path) const;
+
+	bool RelocateFile(const std::filesystem::path& sourcePath, const std::filesystem::path& destinationPath) const;
+
 	const std::filesystem::path& GetProjectRoot() const { return m_ProjectRoot; }
+
+private:
+	bool IsInsideProject(const std::filesystem::path& path) const;
 
 private:
 	std::filesystem::path m_ProjectRoot;

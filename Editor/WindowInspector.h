@@ -2,8 +2,14 @@
 
 #include "ComponentType.h"
 #include <cstdint>
+#include <filesystem>
+#include "AssetTypes.h"
 #include <SimpleMath.h>
 
+class EditorSelection;
+class AssetRegistry;
+class ResourceManager;
+class FileSystem;
 class Scene;
 class GameObject;
 class TransformComponent;
@@ -14,9 +20,15 @@ using DirectX::SimpleMath::Quaternion;
 class WindowInspector
 {
 public:
-    void Draw(Scene* scene, uint64_t selectedUID);
+    void Draw(Scene* scene, const EditorSelection& selection,
+              const FileSystem& fileSystem, const AssetRegistry& registry,
+              const ResourceManager& resources);
 
 private:
+    void DrawGameObject(Scene* scene, uint64_t selectedUID);
+    void DrawAsset(AssetID id, const FileSystem& fileSystem,
+                   const AssetRegistry& registry, const ResourceManager& resources);
+    void DrawFolder(const std::filesystem::path& path, const FileSystem& fileSystem);
     void DrawComponents(GameObject* go);
     void DrawAddComponent(GameObject* go);
     void DrawTransformComponent(TransformComponent* transform);

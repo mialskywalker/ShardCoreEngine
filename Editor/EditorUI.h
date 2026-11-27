@@ -8,6 +8,7 @@
 #include "WindowViewport.h"
 #include "EditorSettings.h"
 #include "EditorGizmo.h"
+#include "EditorSelection.h"
 
 class D3D12Module;
 class ShaderDescriptorModule;
@@ -15,6 +16,9 @@ class Scene;
 class WindowLogger;
 class WindowHierarchy;
 class WindowInspector;
+class WindowContentBrowser;
+class AssetRegistry;
+class ResourceManager;
 class Camera;
 class FileSystem;
 
@@ -37,7 +41,7 @@ public:
 	EditorUI();
 	~EditorUI();
 
-	bool Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descriptors);
+	bool Init(HWND hwnd, D3D12Module& d3d12, ShaderDescriptorModule& descriptors, const FileSystem& fileSystem, AssetRegistry& assetRegistry, ResourceManager& resourceManager);
 	void BeginFrame();
 	void Render(ID3D12GraphicsCommandList* commandList, ShaderDescriptorModule& descriptors);
 	void Shutdown();
@@ -60,9 +64,15 @@ private:
 	void DrawFileMenu(Scene* activeScene, const FileSystem& fileSystem,	const std::filesystem::path& currentScenePath);
 
 private:
+    void ValidateSelection(Scene* scene, const FileSystem& fileSystem);
+    EditorSelection m_Selection;
+    Scene* m_LastSelectionScene = nullptr;
+    AssetRegistry* m_AssetRegistry = nullptr;
+    ResourceManager* m_ResourceManager = nullptr;
 	std::unique_ptr<WindowLogger>		m_WindowLogger;
 	std::unique_ptr<WindowHierarchy>	m_WindowHierarchy;
 	std::unique_ptr<WindowInspector>	m_WindowInspector;
+	std::unique_ptr<WindowContentBrowser> m_WindowContentBrowser;
 	WindowViewport						m_WindowViewport;
 	EditorSettings						m_Settings;
 	EditorGizmo							m_EditorGizmo;

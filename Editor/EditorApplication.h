@@ -22,4 +22,6 @@ private:
     EditorCamera m_EditorCamera;
 
     std::filesystem::path m_CurrentScenePath;
+
+    bool m_EditorUIInitialized = false;
 };

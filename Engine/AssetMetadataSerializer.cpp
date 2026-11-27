@@ -16,7 +16,7 @@ bool AssetMetadataSerializer::SaveMetadata(const std::filesystem::path& sourcePa
 		return false;
 	}
 
-	if (!m_FileSystem.Exists(sourcePath))
+	if (!m_FileSystem.IsRegularFile(sourcePath))
 	{
 		Logger::Log("[AssetMetadataSerializer] Source file doesn't exist!", LogType::Engine);
 		return false;
@@ -62,7 +62,7 @@ bool AssetMetadataSerializer::LoadMetadata(const std::filesystem::path& sourcePa
 		return false;
 	}
 
-	if (!m_FileSystem.Exists(sourcePath))
+	if (!m_FileSystem.IsRegularFile(sourcePath))
 	{
 		Logger::Log("[AssetMetadataSerializer] Source file doesn't exist!", LogType::Engine);
 		return false;

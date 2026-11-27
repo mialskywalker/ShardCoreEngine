@@ -1,34 +1,26 @@
 #include "WindowHierarchy.h"
+#include "EditorSelection.h"
 #include "imgui.h"
 #include "Scene.h"
 #include "GameObject.h"
 
 void WindowHierarchy::Draw(Scene* scene)
 {
-	ImGui::Begin("Hierarchy");
+	if (!ImGui::Begin("Hierarchy"))
+    {
+        ImGui::End();
+        return;
+    }
 
     if (scene && m_SceneName != scene->GetSceneName())
     {
         m_SceneName = scene->GetSceneName();
     }
 
-    if (scene != m_LastScene)
-    {
-        m_SelectedUID = 0;
-        m_LastScene = scene;
-    }
-
-    if (scene && m_SelectedUID != 0)
-    {
-        if (!scene->GetGameObject(m_SelectedUID))
-        {
-            m_SelectedUID = 0;
-        }
-    }
 
 	if (scene)
 	{
-        ImGui::Text(m_SceneName.c_str());
+        ImGui::TextUnformatted(m_SceneName.c_str());
 
 		for (auto& go : scene->GetGameObjects())
 		{
@@ -68,7 +60,11 @@ void WindowHierarchy::Draw(Scene* scene)
         ImGuiPopupFlags_NoOpenOverItems |
         ImGuiPopupFlags_MouseButtonRight))
     {
-        if (ImGui::MenuItem("Create Empty GameObject"))
+        if (ImGui::MenuItem(
+            "Create Empty GameObject",
+            nullptr,
+            false,
+            scene != nullptr))
         {
             scene->CreateGameObject("GameObject");
         }
@@ -77,11 +73,6 @@ void WindowHierarchy::Draw(Scene* scene)
     }
 
 	ImGui::End();
-}
-
-void WindowHierarchy::ClearSelection()
-{
-    m_SelectedUID = 0;
 }
 
 void WindowHierarchy::DrawGameObject(GameObject* go)
@@ -100,12 +91,18 @@ void WindowHierarchy::DrawGameObject(GameObject* go)
     }
 
     // Selected
-    if (m_SelectedUID == go->GetUID())
+    if (m_Selection.GetGameObjectUID() == go->GetUID())
     {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
 
     bool opened = ImGui::TreeNodeEx(static_cast<void*>(go), flags, "%s", go->GetName().c_str());
+
+    if (ImGui::IsItemClicked(ImGuiMouseButton_Left) &&
+        !ImGui::IsItemToggledOpen())
+    {
+        m_Selection.SelectGameObject(go->GetUID());
+    }
 
     if (ImGui::BeginPopupContextItem())
     {
@@ -120,11 +117,6 @@ void WindowHierarchy::DrawGameObject(GameObject* go)
         }
 
         ImGui::EndPopup();
-    }
-
-    if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-    {
-        m_SelectedUID = go->GetUID();
     }
 
     if (opened)

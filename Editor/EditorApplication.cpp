@@ -16,7 +16,12 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 
 EditorApplication::~EditorApplication()
 {
-	m_EditorUI.Shutdown();
+	if (m_EditorUIInitialized)
+	{
+		GetRenderer().GetD3D12()->WaitForGPU();
+
+		m_EditorUI.Shutdown();
+	}
 }
 
 bool EditorApplication::Init()
@@ -38,7 +43,10 @@ bool EditorApplication::Init()
 	if (!m_EditorUI.Init(
 		GetWindow().GetHandle(),
 		*GetRenderer().GetD3D12(),
-		*GetRenderer().GetShaderDescriptors()))
+		*GetRenderer().GetShaderDescriptors(),
+		GetFileSystem(),
+		GetAssetRegistry(),
+		GetResourceManager()))
 	{
 		return false;
 	}
@@ -51,6 +59,8 @@ bool EditorApplication::Init()
 			return false;
 		}
 	);
+
+	m_EditorUIInitialized = true;
 
 	return true;
 }

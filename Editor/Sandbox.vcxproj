@@ -167,6 +167,7 @@
     <ClCompile Include="EditorGizmo.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="WindowContentBrowser.cpp" />
     <ClCompile Include="WindowHierarchy.cpp" />
     <ClCompile Include="WindowInspector.cpp" />
     <ClCompile Include="WindowLogger.cpp" />
@@ -187,12 +188,16 @@
     <ClInclude Include="..\External\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\External\imgui\imstb_textedit.h" />
     <ClInclude Include="..\External\imgui\imstb_truetype.h" />
+    <ClInclude Include="AssetVisuals.h" />
     <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="EditorCamera.h" />
     <ClInclude Include="EditorGizmo.h" />
+    <ClInclude Include="EditorIcons.h" />
+    <ClInclude Include="EditorSelection.h" />
     <ClInclude Include="EditorSettings.h" />
     <ClInclude Include="EditorUI.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="WindowContentBrowser.h" />
     <ClInclude Include="WindowHierarchy.h" />
     <ClInclude Include="WindowInspector.h" />
     <ClInclude Include="WindowLogger.h" />

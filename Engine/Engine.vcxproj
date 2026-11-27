@@ -159,6 +159,7 @@
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTexture.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ResourceModule.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneModule.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="AssetMetadata.h" />
     <ClInclude Include="AssetMetadataSerializer.h" />
     <ClInclude Include="AssetRecord.h" />
+    <ClInclude Include="AssetReference.h" />
     <ClInclude Include="AssetRegistry.h" />
     <ClInclude Include="AssetTypes.h" />
     <ClInclude Include="AssetTypeUtils.h" />
@@ -196,7 +198,9 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ResourceModule.h" />
+    <ClInclude Include="ResourceTraits.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneModule.h" />
     <ClInclude Include="SceneSerializer.h" />

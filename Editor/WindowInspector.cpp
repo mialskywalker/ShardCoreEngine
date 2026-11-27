@@ -1,4 +1,11 @@
 #include "WindowInspector.h"
+#include "EditorSelection.h"
+#include "AssetRegistry.h"
+#include "ResourceManager.h"
+#include "FileSystem.h"
+#include "AssetVisuals.h"
+#include <system_error>
+#include <cmath>
 #include "imgui.h"
 
 #include "Scene.h"
@@ -9,9 +16,42 @@
 
 #include <cstdio>
 
-void WindowInspector::Draw(Scene* scene, uint64_t selectedUID)
+void WindowInspector::Draw(Scene* scene, const EditorSelection& selection,
+    const FileSystem& fileSystem, const AssetRegistry& registry,
+    const ResourceManager& resources)
 {
-	ImGui::Begin("Inspector");
+    if (selection.GetType() != EditorSelectionType::GameObject)
+    {
+        m_LastSelectedUID = 0;
+        m_LastScene = nullptr;
+        m_RotationInitialized = false;
+        m_EditingRotation = false;
+        m_PendingRemoveComponent = ComponentType::None;
+    }
+
+    if (ImGui::Begin("Inspector"))
+    {
+        switch (selection.GetType())
+        {
+        case EditorSelectionType::GameObject:
+            DrawGameObject(scene, selection.GetGameObjectUID());
+            break;
+        case EditorSelectionType::Asset:
+            DrawAsset(selection.GetAssetID(), fileSystem, registry, resources);
+            break;
+        case EditorSelectionType::Folder:
+            DrawFolder(selection.GetFolder(), fileSystem);
+            break;
+        default:
+            ImGui::TextDisabled("No selection");
+            break;
+        }
+    }
+    ImGui::End();
+}
+
+void WindowInspector::DrawGameObject(Scene* scene, uint64_t selectedUID)
+{
 
     if (scene && selectedUID != 0)
     {
@@ -27,6 +67,7 @@ void WindowInspector::Draw(Scene* scene, uint64_t selectedUID)
                 m_LastScene = scene;
                 m_RotationInitialized = false;
                 m_EditingRotation = false;
+                m_PendingRemoveComponent = ComponentType::None;
             }
 
             // Name
@@ -67,7 +108,6 @@ void WindowInspector::Draw(Scene* scene, uint64_t selectedUID)
         }
     }
 
-	ImGui::End();
 }
 
 void WindowInspector::DrawComponents(GameObject* go)
@@ -273,3 +313,59 @@ void WindowInspector::DrawTransformComponent(TransformComponent* transform)
 //        ImGui::EndCombo();
 //    }
 //}
+
+
+namespace
+{
+    void Property(const char* label, const std::string& value)
+    {
+        ImGui::TextDisabled("%s", label);
+        ImGui::TextWrapped("%s", value.c_str());
+    }
+}
+
+void WindowInspector::DrawAsset(AssetID id, const FileSystem& fileSystem,
+    const AssetRegistry& registry, const ResourceManager& resources)
+{
+    const AssetRecord* record = registry.GetAsset(id);
+    if (!record)
+    {
+        ImGui::TextDisabled("Asset not found");
+        return;
+    }
+    const auto visual = AssetVisuals::Get(record->Type);
+    ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(visual.Color),
+                       "%s %s", visual.Icon, visual.Label);
+    ImGui::Separator();
+    Property("Name", record->Name);
+    Property("Asset ID", std::to_string(record->ID));
+    if (ImGui::Button("Copy Asset ID"))
+        ImGui::SetClipboardText(std::to_string(record->ID).c_str());
+    Property("Source path", record->SourcePath.generic_string());
+    Property("Imported path", record->ImportedPath.empty() ?
+             "Not imported" : record->ImportedPath.generic_string());
+    Property("Parent asset", record->ParentAssetID == InvalidAssetID ?
+             "None" : std::to_string(record->ParentAssetID));
+    Property("Extension", record->SourcePath.extension().string());
+    std::error_code ec;
+    const auto bytes = std::filesystem::file_size(
+        fileSystem.ResolvePath(record->SourcePath), ec);
+    Property("Source file size", ec ? "Unavailable" :
+             std::to_string(bytes) + " bytes");
+    Property("Resource status", resources.IsLoaded(id) ?
+             "Cached" : "Not cached");
+}
+
+void WindowInspector::DrawFolder(const std::filesystem::path& path,
+    const FileSystem& fileSystem)
+{
+    const auto visual = AssetVisuals::GetFolder();
+    ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(visual.Color),
+                       "%s Folder", visual.Icon);
+    ImGui::Separator();
+    Property("Name", path.filename().string());
+    Property("Path", path.generic_string());
+    std::error_code ec;
+    const bool exists = std::filesystem::is_directory(fileSystem.ResolvePath(path), ec);
+    Property("Status", exists && !ec ? "Available" : "Unavailable");
+}

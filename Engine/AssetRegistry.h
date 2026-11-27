@@ -23,9 +23,14 @@ public:
 	AssetID CreateAsset(AssetType type, const std::string& name, const std::filesystem::path& sourcePath);
 	AssetID LoadExistingAsset(const std::filesystem::path& sourcePath);
 	AssetID RegisterNewAsset(const std::filesystem::path& sourcePath);
+	AssetID CreateSubAsset(AssetID parentID, AssetType type, const std::string& name);
+
 	bool DiscoverAssets(const std::filesystem::path& directory, std::vector<DiscoveredAsset>& outAssets) const;
 	bool RegisterAsset(const AssetRecord& record);
-	bool RemoveAsset(AssetID id);
+	bool RemoveAsset(AssetID id); // remove asset record
+	bool DeleteAsset(AssetID id); // remove asset file + metadata + sub-assets
+	bool MoveAsset(AssetID id, const std::filesystem::path& destinationPath);
+	bool RenameAsset(AssetID id, const std::string& newName);
 	bool ScanAssets(const std::filesystem::path& directory);
 
 	bool Contains(AssetID id) const;
@@ -34,6 +39,8 @@ public:
 	AssetID GetAssetIDByPath(const std::filesystem::path& sourcePath) const;
 	std::vector<AssetID> GetAssetIDsByPath(const std::filesystem::path& sourcePath) const;
 	const AssetRecord* GetAsset(AssetID id) const;
+	std::vector<AssetRecord> GetAllAssets() const;
+	std::vector<AssetID> GetSubAssets(AssetID parentID) const;
 
 	size_t GetAssetCount() const;
 

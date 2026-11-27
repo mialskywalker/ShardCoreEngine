@@ -6,86 +6,116 @@
 #include "SceneModule.h"
 #include "Scene.h"
 #include "SceneSerializer.h"
-
 #include "AssetRegistry.h"
+#include "ResourceManager.h"
 
 Application::Application() {}
 
-Application::~Application() {}
+Application::~Application()
+{
+    if (m_Renderer.GetD3D12())
+    {
+        m_Renderer.GetD3D12()->WaitForGPU();
+    }
+
+    m_SceneModule.reset();
+    m_ResourceManager.reset();
+    m_AssetRegistry.reset();
+}
 
 bool Application::Init()
 {
-	bool ok = true;
+    bool ok = true;
 
-	// Initialize FileSystem
-	std::filesystem::path projectRoot =	std::filesystem::current_path() / "SandboxProject";
+    // Initialize FileSystem
+    std::filesystem::path projectRoot = std::filesystem::current_path() / "SandboxProject";
 
-	if (!m_FileSystem.Init(projectRoot))
-	{
-		Logger::Error("FileSystem initialization failed", LogType::Engine);
-		return false;
-	}
+    if (!m_FileSystem.Init(projectRoot))
+    {
+        Logger::Error("FileSystem initialization failed", LogType::Engine);
+        return false;
+    }
 
-	// Create project directories
+    // Create project directories
+    ok = ok && m_FileSystem.CreateDirectories(".");
+    ok = ok && m_FileSystem.CreateDirectories("Assets");
+    ok = ok && m_FileSystem.CreateDirectories("Scenes");
+    ok = ok && m_FileSystem.CreateDirectories("Library");
+    ok = ok && m_FileSystem.CreateDirectories("ProjectSettings");
 
-	ok = ok && m_FileSystem.CreateDirectories(".");
-	ok = ok && m_FileSystem.CreateDirectories("Assets");
-	ok = ok && m_FileSystem.CreateDirectories("Scenes");
-	ok = ok && m_FileSystem.CreateDirectories("Library");
-	ok = ok && m_FileSystem.CreateDirectories("ProjectSettings");
+    if (!ok)
+    {
+        Logger::Error("Failed to create project directories", LogType::Engine);
+        return false;
+    }
 
-	if (!ok)
-	{
-		Logger::Error("Failed to create project directories", LogType::Engine);
-		return ok;
-	}
+    // Initialize Asset Registry
+    m_AssetRegistry = std::make_unique<AssetRegistry>(m_FileSystem);
 
-	// Systems init
+    if (!m_AssetRegistry->ScanAssets("Assets"))
+    {
+        Logger::Error("[Application] Asset registry initialization failed.", LogType::Engine);
+        return false;
+    }
 
-	ok = ok && m_Window.Init();
-	ok = ok && Input::Initialize(m_Window.GetHandle());
-	ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
+    // Initialize Window, Input and Renderer
+    ok = ok && m_Window.Init();
+    ok = ok && Input::Initialize(m_Window.GetHandle());
+    ok = ok && m_Renderer.Init(m_Window.GetHandle(), m_Window.GetWidth(), m_Window.GetHeight());
 
-	// Create Scene
-	m_SceneModule = std::make_unique<SceneModule>();
+    if (!ok)
+    {
+        Logger::Error("[Application] Engine systems initialization failed.", LogType::Engine);
+        return false;
+    }
 
-	Scene* scene = m_SceneModule->CreateScene("NewScene");
+    // Initialize Resource Manager
+    m_ResourceManager = std::make_unique<ResourceManager>(*m_AssetRegistry);
 
-	if (!scene || !scene->Init())
-	{
-		return false;
-	}
+    // Register resource loaders
+    // TODO: Texture, Mesh, Audio, etc.
 
-	std::string root = m_FileSystem.GetProjectRoot().string();
-	Logger::Log(root.c_str(), LogType::Engine);
+    // Initialize Scene Module
+    m_SceneModule = std::make_unique<SceneModule>();
 
-	// Testing
-	AssetRegistry asr(m_FileSystem);
-	asr.ScanAssets("Assets");
+    Scene* scene = m_SceneModule->CreateScene("NewScene");
 
-	return ok;
+    if (!scene || !scene->Init())
+    {
+        Logger::Error("[Application] Scene initialization failed.", LogType::Engine);
+        return false;
+    }
+
+    Logger::Log(m_FileSystem.GetProjectRoot().string(), LogType::Engine);
+
+    return true;
 }
 
 void Application::Run()
 {
-	while (m_Running)
-	{
-		m_Running = m_Window.ProcessEvents();
-		m_Timer.Update();
+    while (m_Running)
+    {
+        m_Running = m_Window.ProcessEvents();
 
-		if (m_Window.ConsumeResize())
-		{
-			m_Renderer.GetD3D12()->Resize();
-		}
+        if (!m_Running)
+        {
+            break;
+        }
 
-		OnBeginFrame();
+        m_Timer.Update();
 
-		Update();
-		Render();
-	}
+        if (m_Window.ConsumeResize())
+        {
+            m_Renderer.GetD3D12()->Resize();
+        }
 
-	Logger::Log("Application exit!", LogType::Engine);
-	Logger::Clear();
+        OnBeginFrame();
+
+        Update();
+        Render();
+    }
+
+    Logger::Log("Application exit!", LogType::Engine);
 }
 
 void Application::Update()
