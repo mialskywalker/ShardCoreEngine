@@ -12,7 +12,7 @@ bool ResourceModule::Init(D3D12Module* d3d12)
 		return false;
 
 	m_D3D12 = d3d12;
-	return true;
+	return CreateUploadCommandObject();
 }
 
 ComPtr<ID3D12Resource> ResourceModule::CreateUploadBuffer(size_t bufferSize, void* data)
@@ -63,26 +63,64 @@ ComPtr<ID3D12Resource> ResourceModule::CreateDefaultBuffer(size_t bufferSize, co
 	CD3DX12_HEAP_PROPERTIES vertexProps(D3D12_HEAP_TYPE_DEFAULT);
 	m_D3D12->GetDevice()->CreateCommittedResource(&vertexProps, D3D12_HEAP_FLAG_NONE, &vertexDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&vertexBuffer));
 	
-	// Prep Command List to record
-	m_D3D12->GetCurrentCommandAllocator()->Reset();
-	m_D3D12->GetCommandList()->Reset(m_D3D12->GetCurrentCommandAllocator(), nullptr);
+	// prepare the command list for uploading
+	if (!BeginUpload())
+	{
+		return nullptr;
+	}
 	
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(vertexBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
-	m_D3D12->GetCommandList()->ResourceBarrier(1, &barrier);
+	m_UploadCommandList->ResourceBarrier(1, &barrier);
 	
 	// Copy Data
-	m_D3D12->GetCommandList()->CopyResource(vertexBuffer.Get(), stagingBuffer.Get());
+	m_UploadCommandList->CopyResource(vertexBuffer.Get(), stagingBuffer.Get());
 	
 	// Transition
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(vertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, finalState);
-	m_D3D12->GetCommandList()->ResourceBarrier(1, &barrier);
-	m_D3D12->GetCommandList()->Close();
+	m_UploadCommandList->ResourceBarrier(1, &barrier);
 	
-	// Execute Commands
-	ID3D12CommandList* lists[] = { m_D3D12->GetCommandList() };
-	m_D3D12->GetCommandQueue()->ExecuteCommandLists(1, lists);
-	
-	m_D3D12->WaitForGPU();
+	// Execute command list
+	if (!EndUpload())
+	{
+		return nullptr;
+	}
 
 	return vertexBuffer;
+}
+
+bool ResourceModule::CreateUploadCommandObject()
+{
+	if (!m_D3D12)
+	{
+		return false;
+	}
+
+	ID3D12Device5* device = m_D3D12->GetDevice();
+	bool ok = SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_UploadCommandAllocator)));
+	ok = ok && SUCCEEDED(device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_UploadCommandList)));
+
+	return ok;
+}
+
+bool ResourceModule::BeginUpload()
+{
+	bool ok = SUCCEEDED(m_UploadCommandAllocator->Reset());
+	ok = ok && SUCCEEDED(m_UploadCommandList->Reset(m_UploadCommandAllocator.Get(), nullptr));
+
+	return ok;
+}
+
+bool ResourceModule::EndUpload()
+{
+	if (FAILED(m_UploadCommandList->Close()))
+	{
+		return false;
+	}
+
+	ID3D12CommandList* lists[] = { m_UploadCommandList.Get() };
+	m_D3D12->GetCommandQueue()->ExecuteCommandLists(1, lists);
+
+	m_D3D12->WaitForGPU();
+
+	return true;
 }
